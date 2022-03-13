@@ -1,16 +1,31 @@
-import sys
+#!/usr/bin/python3
+#
+# Copyright 2022 Albino Aveleda <albino@bino.eng.br>
+# summary report spooky2
+#
+import argparse
 
 def main():
-    #filename = "Reverse_Lookup FERNANDO SR 10-3-22 F1.txt"
-    #filename = "Reverse_Lookup BFB FERNANDO COM HARMONICA 10-3-22.txt"
-    if len(sys.argv) == 2:
-        filename = str(sys.argv[1])
+    # Initialize parser
+    parser = argparse.ArgumentParser()
+
+    # Adding optional argument
+    parser.add_argument("-i", "--input", help="input file", required=True)
+    parser.add_argument("-o", "--output", help="output file", required=False)
+
+    # Read arguments from command line
+    args = parser.parse_args()
+
+    if args.input:
+        filename = args.input
+    if args.output:
+        fileout = args.output
+    else:
+        fileout = filename[:-3] + "csv"
     lines = readfile(filename)
     result = createDict(lines)
-    newFilename = filename[:-3] + "csv"
-    printCsv(result, newFilename)
-    #for item in lines:
-    #    print(item)
+    printCsv(result, fileout)
+
 
 def readfile(filename):
     with open(filename) as f:
@@ -25,6 +40,7 @@ def readfile(filename):
     lines.pop(0)
     return lines
 
+
 def createDict(lines):
     matches = {}
     for line in lines:
@@ -35,6 +51,7 @@ def createDict(lines):
             previous_count = matches.get(line, 0)
             matches[line] = previous_count + 1
     return matches
+
 
 def printCsv(varDict, filename):
     with open(filename, 'w') as f:
