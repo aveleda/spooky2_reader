@@ -3,7 +3,7 @@
 # Copyright 2022 Albino Aveleda <albino@bino.eng.br>
 # summary report spooky2
 #
-import tkinter as Tkinter
+import tkinter
 import tkinter.font as tkFont
 from tkinter import ttk
 from tkinter import filedialog as fd
@@ -208,20 +208,20 @@ def exportCsv():
 def main():
     global tree
 
-    root = Tkinter.Tk()
+    root = tkinter.Tk()
     root.wm_title("Report Spooky2")
     root.geometry("800x600")
 
-    menubar = Tkinter.Menu(root)
+    menubar = tkinter.Menu(root)
     root.config(menu=menubar)
 
-    filemenu = Tkinter.Menu(menubar)
+    filemenu = tkinter.Menu(menubar)
     menubar.add_cascade(label="File", menu=filemenu)
     filemenu.add_command(label="Open", command=lambda: openFile())
     filemenu.add_command(label="Export as CSV", command=lambda: exportCsv())
     filemenu.add_separator()
     filemenu.add_command(label="Exit", command=root.quit)
-    optionmenu = Tkinter.Menu(menubar)
+    optionmenu = tkinter.Menu(menubar)
     menubar.add_cascade(label="Options", menu=optionmenu)
     optionmenu.add_command(label="Clean", command=lambda: clearAll())
     #root.wm_iconname("mclist")
