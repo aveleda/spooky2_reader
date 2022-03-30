@@ -8,6 +8,7 @@ import tkinter.font as tkFont
 from tkinter import ttk
 from tkinter import filedialog as fd
 import os.path as path
+import re
 
 # global variables
 tree_columns = ("match", "value", "database")
@@ -52,7 +53,9 @@ def setup_widgets():
     vsb = ttk.Scrollbar(orient="vertical", command=tree.yview)
     hsb = ttk.Scrollbar(orient="horizontal", command=tree.xview)
     tree.configure(yscrollcommand=vsb.set, xscrollcommand=hsb.set)
-    tree.tag_configure('rowFolder', background='orange')
+    #tree.tag_configure('rowFolder', background='orange')
+    tree.tag_configure('rowFolder', background='#EFCFB8')
+    tree.tag_configure('rowInsideFolder', background='#6FCACB')
     tree.grid(column=0, row=0, sticky='nsew', in_=container)
     vsb.grid(column=1, row=0, sticky='ns', in_=container)
     hsb.grid(column=0, row=1, sticky='ew', in_=container)
@@ -84,7 +87,7 @@ def build_tree(tree):
                 aux = item[0]
                 aux = "     " + aux
                 reg = (aux, item[1], item[2])
-                tree.insert(folder, 'end', open=False, values=reg)
+                tree.insert(folder, 'end', open=False, values=reg, tags='rowInsideFolder')
             else:
                 last = auxFirst
                 reg = (auxFirst, str(matchFirst[auxFirst]), '')
@@ -92,7 +95,7 @@ def build_tree(tree):
                 aux = item[0]
                 aux = "     " + aux
                 reg = (aux, item[1], item[2])
-                tree.insert(folder, 'end', open=False, values=reg)
+                tree.insert(folder, 'end', open=False, values=reg, tags='rowInsideFolder')
         else:
             tree.insert('', 'end', open=False, values=item)
 
@@ -123,6 +126,8 @@ def readfile(filename):
     with open(filename, encoding="ISO-8859-1") as f:
         lines = (line.rstrip() for line in f)
         lines = (line for line in lines if line)
+#        lines = (line.replace(":", "") for line in lines)
+        lines = (re.sub('[,:]', "", line) for line in lines)
         lines = list(line for line in lines if line[:3] != "BFB")
     # remove header
     line = lines[0]
@@ -200,8 +205,21 @@ def exportCsv():
             line = key[:ind - 1]
             f.writelines(line + ";" + str(value) + ";" + database + "\n")
 
+def searchStr(parentWindow):
+    answer = Tkinter.simpledialog.askstring("Search", "Find what:",
+                                parent=parentWindow)
+    noFind(answer)
+    return
+
+def noFind(msg):
+    Tkinter.messagebox.showerror("Search", "Can't find the text:\n\"" + msg + "\"")
+
+def clearSearch():
+    return
+
 def about():
-    Tkinter.messagebox.showinfo(title="About", message="Version: " + version)
+    msg = "Reverse Lookup from Spooky2\nEnergia & Amor\nVersion: " + version
+    Tkinter.messagebox.showinfo(title="About", message=msg)
     return
 
 def main():
@@ -221,9 +239,11 @@ def main():
     filemenu.add_separator()
     filemenu.add_command(label="Exit", command=root.quit)
 
-    optionmenu = Tkinter.Menu(menubar)
-    menubar.add_cascade(label="Options", menu=optionmenu)
-    optionmenu.add_command(label="Clean", command=lambda: clearAll())
+    editmenu = Tkinter.Menu(menubar)
+    menubar.add_cascade(label="Edit", menu=editmenu)
+    editmenu.add_command(label="Search", command=lambda: searchStr(root))
+    editmenu.add_command(label="Reset search", command=lambda: clearSearch())
+    editmenu.add_command(label="Clean", command=lambda: clearAll())
 
     helpmenu = Tkinter.Menu(menubar)
     menubar.add_cascade(label="Help", menu=helpmenu)
