@@ -2,7 +2,6 @@
 #
 # Copyright 2022 Albino Aveleda <albino@bino.eng.br>
 # summary report spooky2
-# Version: 1.0.0
 #
 import tkinter as Tkinter
 import tkinter.font as tkFont
@@ -17,6 +16,7 @@ tree = None
 match = {}
 matchFirst = {}
 fileGlobal = ""
+version = "1.0.1"
 
 
 def sortby(tree, col, descending):
@@ -200,6 +200,9 @@ def exportCsv():
             line = key[:ind - 1]
             f.writelines(line + ";" + str(value) + ";" + database + "\n")
 
+def about():
+    Tkinter.messagebox.showinfo(title="About", message="Version: " + version)
+    return
 
 def main():
     global tree
@@ -217,9 +220,15 @@ def main():
     filemenu.add_command(label="Export as CSV", command=lambda: exportCsv())
     filemenu.add_separator()
     filemenu.add_command(label="Exit", command=root.quit)
+
     optionmenu = Tkinter.Menu(menubar)
     menubar.add_cascade(label="Options", menu=optionmenu)
     optionmenu.add_command(label="Clean", command=lambda: clearAll())
+
+    helpmenu = Tkinter.Menu(menubar)
+    menubar.add_cascade(label="Help", menu=helpmenu)
+    helpmenu.add_command(label="About", command=lambda: about())
+    
     #root.wm_iconname("mclist")
 
     tree = setup_widgets()
