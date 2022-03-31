@@ -11,6 +11,7 @@
 - change path on desktop icon
 - change treeview colors
 - change software name
+- fix install script
 
 
 ## v1.1.0
