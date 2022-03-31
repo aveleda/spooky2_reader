@@ -13,6 +13,7 @@ import re
 # global variables
 tree_columns = ("match", "value", "database")
 tree_data = []
+tree_search = []
 tree = None
 match = {}
 matchFirst = {}
@@ -54,8 +55,10 @@ def setup_widgets():
     hsb = ttk.Scrollbar(orient="horizontal", command=tree.xview)
     tree.configure(yscrollcommand=vsb.set, xscrollcommand=hsb.set)
     #tree.tag_configure('rowFolder', background='orange')
-    tree.tag_configure('rowFolder', background='#EFCFB8')
+    #tree.tag_configure('rowFolder', background='#2C8BA9', foreground='#ffffff')
+    tree.tag_configure('rowFolder', background='#49B1CC')
     tree.tag_configure('rowInsideFolder', background='#6FCACB')
+    tree.tag_configure('rowOutsideFolder', background='#EFCFB8')
     tree.grid(column=0, row=0, sticky='nsew', in_=container)
     vsb.grid(column=1, row=0, sticky='ns', in_=container)
     hsb.grid(column=0, row=1, sticky='ew', in_=container)
@@ -106,6 +109,31 @@ def build_tree(tree):
                 tree.column(tree_columns[indx], width=ilen)
 
 
+def build_tree_search(tree):
+    delete_tree()
+    for col in tree_columns:
+        tree.heading(col, text=col.title(),
+            command=lambda c=col: sortby(tree, c, 0))
+        # tkFont.Font().measure expected args are incorrect according
+        #     to the Tk docs
+        tree.column(col, width=tkFont.Font().measure(col.title()))
+
+    last = ""
+    for item in tree_search:
+        aux = item[0]
+        auxFull = aux + " (" + item[2] + ")"
+        auxFirst = aux.split()[0]
+        if auxFirst[-1] == ",":
+            auxFirst = auxFirst[:-1]
+        tree.insert('', 'end', open=False, values=item)
+
+        # adjust columns lenghts if necessary
+        for indx, val in enumerate(item):
+            ilen = tkFont.Font().measure(val)
+            if tree.column(tree_columns[indx], width=None) < ilen:
+                tree.column(tree_columns[indx], width=ilen)
+
+
 def delete_tree():
     global tree
     tree.delete(*tree.get_children())
@@ -120,7 +148,7 @@ def clearAll(parentWindow):
     tree_data.clear()
     fileGlobal = ""
     delete_tree()
-    parentWindow.wm_title("Report Spooky2")
+    parentWindow.wm_title("Spooky2 RL Reader")
 
 
 def readfile(filename):
@@ -170,6 +198,22 @@ def loadTree(varDict):
         tree_data.append(reg)
 
 
+def loadTreeSearch(word):
+    global match
+
+    tree_search.clear()
+    aux = False
+    for key, value in sorted(match.items()):
+        ind = key.rfind("(")
+        database = key[ind + 1:-1]
+        line = key[:ind - 1]
+        if word.lower() in key.lower(): 
+            reg = (line, str(value), database)
+            tree_search.append(reg)
+            aux = True
+    return aux
+
+
 def openFile(parentWindow):
     global fileGlobal, match
 
@@ -208,6 +252,7 @@ def exportCsv():
             line = key[:ind - 1]
             f.writelines(line + ";" + str(value) + ";" + database + "\n")
 
+
 def searchStr(parentWindow):
     ctl = True
     while ctl:
@@ -215,25 +260,33 @@ def searchStr(parentWindow):
                                 parent=parentWindow)
         if (answer is None):
             return
-        noFind(answer)
+        if loadTreeSearch(answer):
+            ctl = False
+            build_tree_search(tree)
+        else:
+            noFind(answer)
     return
+
 
 def noFind(msg):
     Tkinter.messagebox.showerror("Search", "Can't find the text:\n\"" + msg + "\"")
 
+
 def clearSearch():
     return
+
 
 def about():
     msg = "Spooky2 Reverse Lookup Reader\n\nVersion: " + version + "\nEnergia & Amor\n\n(c)2022, Albino Aveleda\nAll rights reserved."
     Tkinter.messagebox.showinfo(title="About", message=msg)
     return
 
+
 def main():
     global tree
 
     root = Tkinter.Tk()
-    root.wm_title("Report Spooky2")
+    root.wm_title("Spooky2 RL Reader")
     root.geometry("800x600")
 
     menubar = Tkinter.Menu(root)
