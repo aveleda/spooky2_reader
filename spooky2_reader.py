@@ -276,7 +276,7 @@ def clearSearch():
 
 
 def about():
-    msg = "Spooky2 Reverse Lookup Reader\n\nVersion: " + version + "\nEnergia & Amor\n\n(c)2022, Albino Aveleda\nAll rights reserved."
+    msg = "Spooky2 Reverse Lookup Reader\n\nVersion: " + version + "\nEnergia e Amor\n\nCopyright (c) 2022 Albino Aveleda"
     Tkinter.messagebox.showinfo(title="About", message=msg)
     return
 
