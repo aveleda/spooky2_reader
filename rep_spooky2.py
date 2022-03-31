@@ -113,13 +113,14 @@ def delete_tree():
     #     tree.delete(i)
 
 
-def clearAll():
+def clearAll(parentWindow):
     global match, matchFirst, fileGlobal, tree_data
     match.clear()
     matchFirst.clear()
     tree_data.clear()
     fileGlobal = ""
     delete_tree()
+    parentWindow.wm_title("Report Spooky2")
 
 
 def readfile(filename):
@@ -169,7 +170,7 @@ def loadTree(varDict):
         tree_data.append(reg)
 
 
-def openFile():
+def openFile(parentWindow):
     global fileGlobal, match
 
     filetypes = (('text files', '*.txt'), ('All files', '*.*'))
@@ -183,6 +184,8 @@ def openFile():
         delete_tree()
     loadTree(match)
     build_tree(tree)
+    file = path.basename(filename)
+    parentWindow.wm_title(file)
 
 
 def exportCsv():
@@ -234,7 +237,7 @@ def main():
 
     filemenu = Tkinter.Menu(menubar)
     menubar.add_cascade(label="File", menu=filemenu)
-    filemenu.add_command(label="Open", command=lambda: openFile())
+    filemenu.add_command(label="Open", command=lambda: openFile(root))
     filemenu.add_command(label="Export as CSV", command=lambda: exportCsv())
     filemenu.add_separator()
     filemenu.add_command(label="Exit", command=root.quit)
@@ -243,7 +246,7 @@ def main():
     menubar.add_cascade(label="Edit", menu=editmenu)
     editmenu.add_command(label="Search", command=lambda: searchStr(root))
     editmenu.add_command(label="Reset search", command=lambda: clearSearch())
-    editmenu.add_command(label="Clean", command=lambda: clearAll())
+    editmenu.add_command(label="Clean", command=lambda: clearAll(root))
 
     helpmenu = Tkinter.Menu(menubar)
     menubar.add_cascade(label="Help", menu=helpmenu)
