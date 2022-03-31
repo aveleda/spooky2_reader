@@ -17,7 +17,7 @@ tree = None
 match = {}
 matchFirst = {}
 fileGlobal = ""
-version = "1.0.1"
+version = "1.2.0"
 
 
 def sortby(tree, col, descending):
@@ -209,9 +209,13 @@ def exportCsv():
             f.writelines(line + ";" + str(value) + ";" + database + "\n")
 
 def searchStr(parentWindow):
-    answer = Tkinter.simpledialog.askstring("Search", "Find what:",
+    ctl = True
+    while ctl:
+        answer = Tkinter.simpledialog.askstring("Search", "Find what:",
                                 parent=parentWindow)
-    noFind(answer)
+        if (answer is None):
+            return
+        noFind(answer)
     return
 
 def noFind(msg):
@@ -221,7 +225,7 @@ def clearSearch():
     return
 
 def about():
-    msg = "Reverse Lookup from Spooky2\nEnergia & Amor\nVersion: " + version
+    msg = "Spooky2 Reverse Lookup Reader\n\nVersion: " + version + "\nEnergia & Amor\n\n(c)2022, Albino Aveleda\nAll rights reserved."
     Tkinter.messagebox.showinfo(title="About", message=msg)
     return
 
@@ -251,6 +255,8 @@ def main():
     helpmenu = Tkinter.Menu(menubar)
     menubar.add_cascade(label="Help", menu=helpmenu)
     helpmenu.add_command(label="About", command=lambda: about())
+
+    root.option_add('*Dialog.msg.font', 'Helvica 11')
     
     #root.wm_iconname("mclist")
 
