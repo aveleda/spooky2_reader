@@ -40,12 +40,6 @@ def sortby(tree, col, descending):
 
 
 def setup_widgets():
-    #global fileGlobal
-    #msg = ttk.Label(wraplength="4i", justify="left", anchor="n",
-    #    padding=(10, 2, 10, 6),
-    #    text="File: " + path.basename(fileGlobal))
-    #msg.pack(fill='x')
-
     container = ttk.Frame()
     container.pack(fill='both', expand=True)
 
@@ -83,8 +77,8 @@ def build_tree(tree):
         aux = item[0]
         auxFull = aux + " (" + item[2] + ")"
         auxFirst = aux.split()[0]
-        if auxFirst[-1] == ",":
-            auxFirst = auxFirst[:-1]
+        #if auxFirst[-1] == ",":
+        #    auxFirst = auxFirst[:-1]
         if int(matchFirst[auxFirst]) > int(match[auxFull]):
             if last == auxFirst:
                 aux = item[0]
@@ -125,7 +119,7 @@ def build_tree_search(tree):
         auxFirst = aux.split()[0]
         if auxFirst[-1] == ",":
             auxFirst = auxFirst[:-1]
-        tree.insert('', 'end', open=False, values=item)
+        tree.insert('', 'end', open=False, values=item, tags='rowOutsideFolder')
 
         # adjust columns lenghts if necessary
         for indx, val in enumerate(item):
@@ -155,7 +149,7 @@ def readfile(filename):
     with open(filename, encoding="ISO-8859-1") as f:
         lines = (line.rstrip() for line in f)
         lines = (line for line in lines if line)
-#        lines = (line.replace(":", "") for line in lines)
+#       lines = (line.replace(":", "") for line in lines)
         lines = (re.sub('[,:]', "", line) for line in lines)
         lines = list(line for line in lines if line[:3] != "BFB")
     # remove header
@@ -273,6 +267,11 @@ def noFind(msg):
 
 
 def clearSearch():
+    global fileGlobal
+
+    if fileGlobal == '':
+        return
+    build_tree(tree)
     return
 
 
