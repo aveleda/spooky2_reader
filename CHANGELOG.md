@@ -1,4 +1,4 @@
-# rep_spooky2 Changelog
+# spooky2_reader Changelog
 
 ## v1.2.0
 
@@ -10,6 +10,7 @@
 - change name on menu Option to Edit
 - change path on desktop icon
 - change treeview colors
+- change software name
 
 
 ## v1.1.0

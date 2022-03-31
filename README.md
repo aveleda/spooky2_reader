@@ -1,1 +1,1 @@
-# Reverse Lookup reader from Spooky2
+# Spooky2 Reverse Lookup Reader

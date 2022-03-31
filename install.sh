@@ -2,10 +2,10 @@
 
 echo -n "Installing... "
 mkdir -p ~/.local/bin ~/.local/share/icons
-cp -p rep_spooky2.py  ~/.local/bin
-cp -p rep_spooky2.png ~/.local/share/icons
-chmod 755 ~/.local/bin/rep_spooky2.py
+cp -p spooky2_reader.py  ~/.local/bin
+cp -p spooky2_reader.png ~/.local/share/icons
+chmod 755 ~/.local/bin/spooky2_reader.py
 USER=`whoami`
-sed 's/USER/'"$USER"'/g' report_spooky2.desktop.dist > ~/Desktop/report_spooky2.desktop
-sudo apt-get install python3-tk
+sed 's/USER/'"$USER"'/g' spooky2_reader.desktop.dist > ~/Desktop/spooky2_reader.desktop
+#sudo apt-get install python3-tk
 echo "Done."

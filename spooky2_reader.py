@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
 # Copyright 2022 Albino Aveleda <albino@bino.eng.br>
-# summary report spooky2
+# spooky2 reader
 #
 import tkinter as Tkinter
 import tkinter.font as tkFont

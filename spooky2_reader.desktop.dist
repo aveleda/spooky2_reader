@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Spooky2 Reader
+GenericName=Spooky2 Reader
+Comment=Spooky2 Reader Summary
+Exec=/home/USER/.local/bin/spooky2_reader.py
+Path=/home/USER/
+Icon=/home/USER/.local/share/icons/spooky2_reader.png
+Terminal=false
+Type=Application
+Categories=Application
