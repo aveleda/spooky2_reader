@@ -5,7 +5,6 @@
 ### New features
 - add menu Edit->Find
 - add menu Edit->Reset Find
-- add menu About
 
 ### Fixes
 - change name on menu Option to Edit
