@@ -9,4 +9,4 @@ $ ./install.sh
 
 ## Install on Windows
 - Rename the <b>spooky2_reader.py</b> to <b>spooky2_reader.pyw</b>
-- Copy the spooky2_reader.pyw file to Desktop
+- Copy the <b>spooky2_reader.pyw</b> file to Desktop
