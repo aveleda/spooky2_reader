@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
-# Copyright 2022 Albino Aveleda <albino@bino.eng.br>
-# spooky2 reader
+# Copyright (c) 2022 Albino Aveleda <albino@skybion.com.br> <albino@bino.eng.br>
+# Spooky2 RL Reader
 #
 import tkinter as Tkinter
 import tkinter.font as tkFont
@@ -248,6 +248,10 @@ def exportCsv():
 
 
 def searchStr(parentWindow):
+    global fileGlobal
+
+    if fileGlobal == '':
+        return
     ctl = True
     while ctl:
         answer = Tkinter.simpledialog.askstring("Search", "Find what:",
@@ -276,7 +280,7 @@ def clearSearch():
 
 
 def about():
-    msg = "Spooky2 Reverse Lookup Reader\n\nVersion: " + version + "\nEnergia e Amor\n\nCopyright (c) 2022 Albino Aveleda"
+    msg = "Spooky2 Reverse Lookup Reader\n\nVersion: " + version + "\n\nEnergia e Amor\n\nCopyright (c) 2022 Skybion"
     Tkinter.messagebox.showinfo(title="About", message=msg)
     return
 
@@ -300,8 +304,8 @@ def main():
 
     editmenu = Tkinter.Menu(menubar)
     menubar.add_cascade(label="Edit", menu=editmenu)
-    editmenu.add_command(label="Search", command=lambda: searchStr(root))
-    editmenu.add_command(label="Reset search", command=lambda: clearSearch())
+    editmenu.add_command(label="Find", command=lambda: searchStr(root))
+    editmenu.add_command(label="Reset Find", command=lambda: clearSearch())
     editmenu.add_command(label="Clean", command=lambda: clearAll(root))
 
     helpmenu = Tkinter.Menu(menubar)
