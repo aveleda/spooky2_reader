@@ -280,7 +280,8 @@ def clearSearch():
 
 
 def about():
-    msg = "Spooky2 Reverse Lookup Reader\n\nVersion: " + version + "\n\nEnergia e Amor\n\nCopyright (c) 2022 Skybion"
+    msg = "Spooky2 Reverse Lookup Reader\n\nVersion: " + version 
+    msg = msg + "\n\nEnergia e Amor\nhttp://www.energiaeamor.com\n\nCopyright (c) 2022 Skybion"
     Tkinter.messagebox.showinfo(title="About", message=msg)
     return
 
