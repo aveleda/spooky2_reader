@@ -8,5 +8,6 @@ $ ./install.sh
 
 
 ## Install on Windows
+- Install Python on Windows
 - Rename the <b>spooky2_reader.py</b> to <b>spooky2_reader.pyw</b>
 - Copy the <b>spooky2_reader.pyw</b> file to Desktop
