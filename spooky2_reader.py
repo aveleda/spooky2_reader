@@ -19,7 +19,7 @@ tree = None
 match = {}
 matchFirst = {}
 fileGlobal = ""
-version = "1.2.1"
+version = "1.2.2"
 
 
 def sortby(tree, col, descending):
@@ -282,7 +282,7 @@ def clearSearch():
 
 def about():
     msg = "Spooky2 Reverse Lookup Reader\n\nVersion: " + version 
-    msg = msg + "\n\nEnergia e Amor\nhttp://www.energiaeamor.com\n\nCopyright (C) 2022 Skybion\nGPLv3"
+    msg = msg + "\n\nEnergia e Amor\nhttp://www.energiaeamor.com\n\nCopyright (C) 2022 Skybion"
     Tkinter.messagebox.showinfo(title="About", message=msg)
     return
 
