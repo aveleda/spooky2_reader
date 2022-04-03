@@ -19,7 +19,7 @@ tree = None
 match = {}
 matchFirst = {}
 fileGlobal = ""
-version = "1.2.0"
+version = "1.2.1"
 
 
 def sortby(tree, col, descending):
