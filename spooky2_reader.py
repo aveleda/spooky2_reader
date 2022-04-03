@@ -2,6 +2,7 @@
 #
 # Copyright (c) 2022 Albino Aveleda <albino@skybion.com.br> <albino@bino.eng.br>
 # Spooky2 RL Reader
+# License: GPLv3
 #
 import tkinter as Tkinter
 import tkinter.font as tkFont
@@ -281,7 +282,7 @@ def clearSearch():
 
 def about():
     msg = "Spooky2 Reverse Lookup Reader\n\nVersion: " + version 
-    msg = msg + "\n\nEnergia e Amor\nhttp://www.energiaeamor.com\n\nCopyright (c) 2022 Skybion"
+    msg = msg + "\n\nEnergia e Amor\nhttp://www.energiaeamor.com\n\nCopyright (C) 2022 Skybion\nGPLv3"
     Tkinter.messagebox.showinfo(title="About", message=msg)
     return
 
