@@ -224,7 +224,7 @@ def openFile(parentWindow):
     loadTree(match)
     build_tree(tree)
     file = path.basename(filename)
-    parentWindow.wm_title("Spooky2 RL: " + file)
+    parentWindow.wm_title("SRL Reader: " + file)
 
 
 def exportCsv():

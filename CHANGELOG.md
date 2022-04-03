@@ -1,5 +1,17 @@
 # spooky2_reader Changelog
 
+## v1.2.2
+
+### FIxes
+- Fix title name + filename
+
+
+## v1.2.1
+
+### FIxes
+- add license
+
+
 ## v1.2.0
 
 ### New features
