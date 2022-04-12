@@ -1,10 +1,15 @@
 # spooky2_reader Changelog
 
+
+## v1.3.1
+
+### New features
+- add shortkeys (Ctrl+O) (Ctrl+C) (Ctrl+F)
+
 ## v1.3.0
 
 ### New features
-- add menu Edit -> Copy (Ctrl+c)
-
+- add menu Edit -> Copy
 
 ## v1.2.2
 
