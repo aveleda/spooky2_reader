@@ -1,5 +1,11 @@
 # spooky2_reader Changelog
 
+## v1.3.0
+
+### New features
+- add menu Edit -> Copy (Ctrl+c)
+
+
 ## v1.2.2
 
 ### FIxes

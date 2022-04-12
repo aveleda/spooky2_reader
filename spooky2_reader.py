@@ -11,6 +11,8 @@ from tkinter import filedialog as fd
 import os.path as path
 import re
 
+from click import option
+
 # global variables
 tree_columns = ("match", "value", "database")
 tree_data = []
@@ -19,7 +21,7 @@ tree = None
 match = {}
 matchFirst = {}
 fileGlobal = ""
-version = "1.2.2"
+version = "1.3.0"
 
 
 def sortby(tree, col, descending):
@@ -280,6 +282,39 @@ def clearSearch():
     return
 
 
+# def copy_from_treeview(tree, event):
+#     selection = tree.selection()
+#     column = tree.identify_column(event.x)
+#     column_no = int(column.replace("#", "")) - 1
+            
+#     copy_values = []
+#     for each in selection:
+#         try:
+#             value = tree.item(each)["values"][column_no]
+#             copy_values.append(str(value))
+#         except:
+#             pass
+        
+#     copy_string = "\n".join(copy_values)
+#     pyperclip.copy(copy_string)
+
+def copy_from_treeview(parentWindow):
+    curItem = tree.focus()
+    #curItem = tree.selection()[0]
+    
+    #curItems = tree.selection()
+    # for i in curItems:
+    #   s = str(tree.item(i)['values'])
+    #   parentWindow.clipboard_append(s+'\n')
+
+    parentWindow.clipboard_clear()
+    aux = list(tree.item(curItem).values())
+    #parentWindow.clipboard_append(aux[2][0])
+    aux = aux[2][0].lstrip()
+    parentWindow.clipboard_append(aux)
+    parentWindow.update() # now it stays on the clipboard after the window is closed
+
+
 def about():
     msg = "Spooky2 Reverse Lookup Reader\n\nVersion: " + version 
     msg = msg + "\n\nEnergia e Amor\nhttp://www.energiaeamor.com\n\nCopyright (C) 2022 Skybion"
@@ -306,9 +341,14 @@ def main():
 
     editmenu = Tkinter.Menu(menubar)
     menubar.add_cascade(label="Edit", menu=editmenu)
+    editmenu.add_command(label="Copy", command=lambda: copy_from_treeview(root))
+    editmenu.add_separator()
     editmenu.add_command(label="Find", command=lambda: searchStr(root))
     editmenu.add_command(label="Reset Find", command=lambda: clearSearch())
+    editmenu.add_separator()
     editmenu.add_command(label="Clean", command=lambda: clearAll(root))
+
+    root.bind("<Control-Key-c>", lambda x: copy_from_treeview(root))
 
     helpmenu = Tkinter.Menu(menubar)
     menubar.add_cascade(label="Help", menu=helpmenu)
