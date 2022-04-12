@@ -19,7 +19,7 @@ tree = None
 match = {}
 matchFirst = {}
 fileGlobal = ""
-version = "1.3.2"
+version = "1.3.3"
 
 
 def sortby(tree, col, descending):
@@ -321,13 +321,15 @@ def main():
     editmenu.add_command(label="Copy (Ctrl+C)", command=lambda: copy_from_treeview(root))
     editmenu.add_separator()
     editmenu.add_command(label="Find (Ctrl+F)", command=lambda: searchStr(root))
-    editmenu.add_command(label="Reset Find", command=lambda: clearSearch())
+    editmenu.add_command(label="Reset Find (Ctrl+R)", command=lambda: clearSearch())
     editmenu.add_separator()
     editmenu.add_command(label="Clean", command=lambda: clearAll(root))
 
     root.bind("<Control-Key-o>", lambda x: openFile(root))
     root.bind("<Control-Key-c>", lambda x: copy_from_treeview(root))
     root.bind("<Control-Key-f>", lambda x: searchStr(root))
+    root.bind("<Control-Key-r>", lambda x: clearSearch())
+
 
     helpmenu = Tkinter.Menu(menubar)
     menubar.add_cascade(label="Help", menu=helpmenu)

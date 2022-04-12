@@ -1,5 +1,11 @@
 # spooky2_reader Changelog
 
+## v1.3.3
+
+### New features
+- add shortcut (Ctrl+R)
+
+
 ## v1.3.2
 
 ### Fixes
@@ -8,7 +14,7 @@
 ## v1.3.1
 
 ### New features
-- add shortkeys (Ctrl+O) (Ctrl+C) (Ctrl+F)
+- add shortcuts (Ctrl+O) (Ctrl+C) (Ctrl+F)
 
 ## v1.3.0
 
