@@ -281,6 +281,11 @@ def clearSearch():
 
 
 def copy_from_treeview(parentWindow):
+    global fileGlobal
+
+    if fileGlobal == '':
+        return
+        
     curItem = tree.focus()
     #curItem = tree.selection()[0]
     
