@@ -1,5 +1,9 @@
 # spooky2_reader Changelog
 
+## v1.3.2
+
+### Fixes
+- remove from click import option
 
 ## v1.3.1
 
@@ -19,7 +23,7 @@
 
 ## v1.2.1
 
-### FIxes
+### Fixes
 - add license
 
 
