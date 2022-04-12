@@ -11,8 +11,6 @@ from tkinter import filedialog as fd
 import os.path as path
 import re
 
-from click import option
-
 # global variables
 tree_columns = ("match", "value", "database")
 tree_data = []
@@ -21,7 +19,7 @@ tree = None
 match = {}
 matchFirst = {}
 fileGlobal = ""
-version = "1.3.1"
+version = "1.3.2"
 
 
 def sortby(tree, col, descending):
