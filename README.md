@@ -13,31 +13,28 @@
 | 1.2.x | Added Find and Reset Find menu|
 | 1.1.x| Show file name on the window title|
 
-## Install
+## Install on Linux based (Ubuntu with GNOME interface)
 1. Download the release version desired (.tar.gz or .zip) or clone repository git.
 2. Open Terminal.
 3. Extract the .tar.gz or .zip
 ```
    $ tar xvzf PACKAGENAME.tar.gz
 ```
+or
 ```
    $ unzip PACKAGENAME.zip
 ```
-4. Navigate to the extracted folder using cd command.
+4. Navigate to the extracted folder using <b>cd</b> command.
 ```
-   1. $ cd PACKAGENAME.
+   $ cd PACKAGENAME
 ```
-5. Now run the following command to install the tarball or zip file.
-
-
-## Install on Linux based (Ubuntu)
-- Run the install script</br>
+5. Now run the following command to install.
 
 ```
 $ ./install.sh
 ```
 
-- Right-click on desktop icon and select <b>"Allow Launching"</b>
+6. Right-click on desktop icon and select <b>"Allow Launching"</b>
 
 
 ## Install on Windows
