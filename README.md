@@ -13,10 +13,10 @@
 | 1.2.x | Added Find and Reset Find menu|
 | 1.1.x| Show file name on the window title|
 
-## Install on Linux based (Ubuntu with GNOME interface)
-1. Download the release version desired (.tar.gz or .zip) or clone repository git.
+## Install on Linux based (Ubuntu with GNOME Desktop)
+1. Download the release version desired (<b>.tar.gz</b> or <b>.zip</b>) or clone repository git.
 2. Open Terminal.
-3. Extract the .tar.gz or .zip
+3. Extract the <b>.tar.gz</b> or <b>.zip</b>
 ```
    $ tar xvzf PACKAGENAME.tar.gz
 ```
