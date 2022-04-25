@@ -19,7 +19,7 @@ tree = None
 match = {}
 matchFirst = {}
 fileGlobal = ""
-version = "1.3.3"
+version = "1.3.4"
 
 
 def sortby(tree, col, descending):
@@ -259,6 +259,7 @@ def searchStr(parentWindow):
                                 parent=parentWindow)
         if (answer is None):
             return
+        answer = answer.strip()
         if loadTreeSearch(answer):
             ctl = False
             build_tree_search(tree)
