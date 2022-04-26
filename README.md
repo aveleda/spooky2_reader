@@ -31,7 +31,7 @@ or
 5. Now run the following command to install.
 
 ```
-$ ./install.sh
+$ bash ./install.sh
 ```
 
 6. Right-click on desktop icon and select <b>"Allow Launching"</b>
