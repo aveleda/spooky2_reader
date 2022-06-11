@@ -155,7 +155,7 @@ class Menu_Funcs():
         return
 
 
-    def openFile(self, parentWindow):
+    def openFile(self):
         filetypes = (('text files', '*.txt'), ('All files', '*.*'))
         full_filenames = fd.askopenfilenames(title='Open a report', filetypes=filetypes)
         if full_filenames == '':
@@ -163,7 +163,7 @@ class Menu_Funcs():
         #pb = Progressbar(parentWindow, orient=HORIZONTAL, length=200, mode='indeterminate')
         #pb.place(x=100, y=100)
         #pb.start()
-        parentWindow.config(cursor="watch")
+        self.root.config(cursor="watch")
         for file_name in full_filenames:
             file = path.basename(file_name)
             self.file_list.append(file)
@@ -181,7 +181,7 @@ class Menu_Funcs():
             #self.loadTree(match)
             #self.build_tree(tree)
         #pb.destroy()
-        parentWindow.config(cursor="arrow")
+        self.root.config(cursor="arrow")
         return
 
     def exportCsv(self):
@@ -256,7 +256,7 @@ class App(Menu_Funcs):
     def ws(self):
         self.root.title("Spooky2 RL Reader")
         self.root.configure(background='#1e3743')
-        self.root.geometry("800x700")
+        self.root.geometry("800x640")
         self.root.resizable(True, True)
         #self.root.maxsize(width=800, height=700)
         self.root.minsize(width=500, height=300)
@@ -289,7 +289,7 @@ class App(Menu_Funcs):
 
         filemenu = tk.Menu(menubar)
         menubar.add_cascade(label="File", menu=filemenu)
-        filemenu.add_command(label="Open (Ctrl+O)", command=lambda: self.openFile(root))
+        filemenu.add_command(label="Open (Ctrl+O)", command=lambda: self.openFile())
         filemenu.add_command(label="Export as CSV", command=lambda: self.exportCsv())
         filemenu.add_separator()
         filemenu.add_command(label="Exit", command=root.quit)
@@ -303,7 +303,7 @@ class App(Menu_Funcs):
         editmenu.add_separator()
         #editmenu.add_command(label="Clean", command=lambda: clearAll(root))
 
-        root.bind("<Control-Key-o>", lambda x: self.openFile(root))
+        root.bind("<Control-Key-o>", lambda x: self.openFile())
         #root.bind("<Control-Key-c>", lambda x: copy_from_treeview(root))
         #root.bind("<Control-Key-f>", lambda x: searchStr(root))
         #root.bind("<Control-Key-r>", lambda x: clearSearch())
