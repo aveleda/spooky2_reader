@@ -11,9 +11,10 @@ from tkinter import Frame, Label
 from tkinter import HORIZONTAL, ttk
 from tkinter import filedialog as fd
 #from tkinter.ttk import Progressbar
-#from tkinter.tix import Balloon
+from tkinter.tix import Balloon
 import os.path as path
 import re
+#from tktooltip import ToolTip
 
 VERSION = "2.0.0"
 
@@ -156,16 +157,17 @@ class Menu_Funcs():
 
     def openFile(self, parentWindow):
         filetypes = (('text files', '*.txt'), ('All files', '*.*'))
-        filenames = fd.askopenfilenames(title='Open a report', filetypes=filetypes)
-        if filenames == '':
+        full_filenames = fd.askopenfilenames(title='Open a report', filetypes=filetypes)
+        if full_filenames == '':
             return
         #pb = Progressbar(parentWindow, orient=HORIZONTAL, length=200, mode='indeterminate')
         #pb.place(x=100, y=100)
         #pb.start()
         parentWindow.config(cursor="watch")
-        for file_name in filenames:
+        for file_name in full_filenames:
             file = path.basename(file_name)
             self.file_list.append(file)
+            self.full_filename_list.append(file_name)
             file = file[:file.rfind('.')]
             file = file[:6] + '...' if len(file) > 6 else file
             #parentWindow.wm_title("SRL Reader: " + file)
@@ -181,6 +183,24 @@ class Menu_Funcs():
         #pb.destroy()
         parentWindow.config(cursor="arrow")
         return
+
+    def exportCsv(self):
+        idx = self.abas.index("current")
+        filename = self.full_filename_list[idx][:-3] + "csv"
+        initial_path = path.dirname(filename)
+        file = path.basename(filename)
+        filetypes = (('CSV files', '*.csv'), ('text files', '*.txt'), ('All files', '*.*'))
+        filename = fd.asksaveasfilename(title='Export CSV', filetypes=filetypes,
+                                        initialfile=file, initialdir=initial_path)
+        if filename == '':
+            return
+        with open(filename, 'w') as f:
+            for key, value in sorted(self.match.items()):
+                ind = key.rfind("(")
+                database = key[ind + 1:-1]
+                line = key[:ind - 1]
+                f.writelines(line + ";" + str(value) + ";" + database + "\n")
+
 
     def change_state(self, *args):
         #t_nos=str(my_tabs.index(my_tabs.select()))
@@ -211,6 +231,7 @@ class App(Menu_Funcs):
     def __init__(self):
         #self.frame_abas = []
         self.file_list = []
+        self.full_filename_list = []
         self.root = root
         #self.abas = ttk.Notebook(self.root)
         self.abas = CustomNotebook(self.root)
@@ -221,7 +242,7 @@ class App(Menu_Funcs):
         #Create a tooltip
         #tip = Balloon(self.root)
         #Bind the tooltip with button
-        #tip.bind_widget(self.abas,balloonmsg="Python is an interpreted")
+        #tip.bind_widget(self.abas,balloonmsg="test")
         #self.abas.bind("<<Enter>>", self.on_enter)
         #self.abas.bind("<<Leave>>", self.on_leave)
         #self.abas.pack()
@@ -269,7 +290,7 @@ class App(Menu_Funcs):
         filemenu = tk.Menu(menubar)
         menubar.add_cascade(label="File", menu=filemenu)
         filemenu.add_command(label="Open (Ctrl+O)", command=lambda: self.openFile(root))
-        #filemenu.add_command(label="Export as CSV", command=lambda: exportCsv())
+        filemenu.add_command(label="Export as CSV", command=lambda: self.exportCsv())
         filemenu.add_separator()
         filemenu.add_command(label="Exit", command=root.quit)
 
