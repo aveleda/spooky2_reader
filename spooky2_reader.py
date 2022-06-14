@@ -185,15 +185,18 @@ class Menu_Funcs():
         return
 
     def exportCsv(self):
+        if self.abas.index("end") == 0:
+            return
         idx = self.abas.index("current")
         filename = self.full_filename_list[idx][:-3] + "csv"
         initial_path = path.dirname(filename)
         file = path.basename(filename)
         filetypes = (('CSV files', '*.csv'), ('text files', '*.txt'), ('All files', '*.*'))
         filename = fd.asksaveasfilename(title='Export CSV', filetypes=filetypes,
-                                        initialfile=file, initialdir=initial_path)
-        if filename == '':
+                                    initialfile=file, initialdir=initial_path)
+        if filename == "":
             return
+
         with open(filename, 'w') as f:
             for key, value in sorted(self.match.items()):
                 ind = key.rfind("(")
