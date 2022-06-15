@@ -130,6 +130,71 @@ class Menu_Funcs():
         lines.pop(0)
         return lines
 
+    def build_tree(self):
+        #delete_tree()
+        for col in self.tree_columns:
+            tree.heading(col, text=col.title(),
+                command=lambda c=col: sortby(tree, c, 0))
+            # tkFont.Font().measure expected args are incorrect according
+            #     to the Tk docs
+            tree.column(col, width=tkFont.Font().measure(col.title()))
+
+        last = ""
+        for item in tree_data:
+            aux = item[0]
+            auxFull = aux + " (" + item[2] + ")"
+            auxFirst = aux.split()[0]
+            #if auxFirst[-1] == ",":
+            #    auxFirst = auxFirst[:-1]
+            if int(matchFirst[auxFirst]) > int(match[auxFull]):
+                if last == auxFirst:
+                    aux = item[0]
+                    aux = "     " + aux
+                    reg = (aux, item[1], item[2])
+                    tree.insert(folder, 'end', open=False, values=reg, tags='rowInsideFolder')
+                else:
+                    last = auxFirst
+                    reg = (auxFirst, str(matchFirst[auxFirst]), '')
+                    folder = tree.insert('', 'end', open=False, values=reg, tags='rowFolder')
+                    aux = item[0]
+                    aux = "     " + aux
+                    reg = (aux, item[1], item[2])
+                    tree.insert(folder, 'end', open=False, values=reg, tags='rowInsideFolder')
+            else:
+                tree.insert('', 'end', open=False, values=item)
+
+            # adjust columns lenghts if necessary
+            for indx, val in enumerate(item):
+                ilen = tkFont.Font().measure(val)
+                if tree.column(tree_columns[indx], width=None) < ilen:
+                    tree.column(tree_columns[indx], width=ilen)
+
+
+    def build_tree_search(self):
+        #delete_tree()
+        for col in self.tree_columns:
+            tree.heading(col, text=col.title(),
+                command=lambda c=col: sortby(tree, c, 0))
+            # tkFont.Font().measure expected args are incorrect according
+            #     to the Tk docs
+            tree.column(col, width=tkFont.Font().measure(col.title()))
+
+        last = ""
+        for item in tree_search:
+            aux = item[0]
+            auxFull = aux + " (" + item[2] + ")"
+            auxFirst = aux.split()[0]
+            if auxFirst[-1] == ",":
+                auxFirst = auxFirst[:-1]
+            tree.insert('', 'end', open=False, values=item, tags='rowOutsideFolder')
+
+            # adjust columns lenghts if necessary
+            for indx, val in enumerate(item):
+                ilen = tkFont.Font().measure(val)
+                if tree.column(tree_columns[indx], width=None) < ilen:
+                    tree.column(tree_columns[indx], width=ilen)
+
+
     def createDict(self, lines):
         match = {}
         matchFirst = {}
@@ -152,7 +217,20 @@ class Menu_Funcs():
                     lineSecond = lineFirst + " " + lineSecond
                     previousCount = matchSecond.get(lineSecond, 0)
                     matchSecond[lineSecond] = previousCount + 1
-        return
+        self.match_list.append(match)
+        return matchFirst, matchSecond
+
+
+    def loadTree(self):
+        #tree_data.clear()
+        tree_data = []
+        for key, value in sorted(self.match_list[-1].items()):
+            ind = key.rfind("(")
+            database = key[ind + 1:-1]
+            line = key[:ind - 1]
+            reg = (line, str(value), database)
+            tree_data.append(reg)
+        return tree_data
 
 
     def openFile(self):
@@ -177,12 +255,13 @@ class Menu_Funcs():
             self.abas.add(frame_abas, text=file)
             #self.frame_abas[-1].bind('Activate', parentWindow.wm_title(file))
             lines = self.readfile(file_name)
-            self.createDict(lines)
-            #self.loadTree(match)
+            match1, match2 = self.createDict(lines)
+            tree_reg = self.loadTree()
             #self.build_tree(tree)
         #pb.destroy()
         self.root.config(cursor="arrow")
         return
+
 
     def exportCsv(self):
         if self.abas.index("end") == 0:
@@ -210,6 +289,7 @@ class Menu_Funcs():
         idx = self.abas.index("current")
         self.root.title(self.file_list[idx])
     
+
     def close_state(self, *args):
         #t_nos=str(my_tabs.index(my_tabs.select()))
         idx = self.abas.index("current")
@@ -221,6 +301,7 @@ class Menu_Funcs():
 
     # def on_leave(self, event):
     #     self.l2.configure(text="")
+
 
     def about(self):
         msg = "Spooky2 Reverse Lookup Reader\n\nVersion: " + VERSION 
@@ -235,7 +316,9 @@ class App(Menu_Funcs):
         #self.frame_abas = []
         self.file_list = []
         self.full_filename_list = []
+        self.match_list = []
         self.root = root
+        self.tree_columns = ("match", "value", "database")
         #self.abas = ttk.Notebook(self.root)
         self.abas = CustomNotebook(self.root)
         self.abas.place(relx=0, rely=0, relwidth=1, relheight=1)
@@ -256,6 +339,7 @@ class App(Menu_Funcs):
         # create Loop
         root.mainloop()
 
+
     def ws(self):
         self.root.title("Spooky2 RL Reader")
         self.root.configure(background='#1e3743')
@@ -263,10 +347,12 @@ class App(Menu_Funcs):
         self.root.resizable(True, True)
         #self.root.maxsize(width=800, height=700)
         self.root.minsize(width=500, height=300)
-    
+
+
     def frames_ws(self):
         container = ttk.Frame()
         container.pack(fill='both', expand=True)
+
 
     def widgets_frame(self):
         #self.abas = ttk.Notebook(self.root);
@@ -283,6 +369,7 @@ class App(Menu_Funcs):
 
         self.label1 = Label(self.frame_aba1, text="trtrta");
         self.label1.pack(side = "top")
+
 
     def Menus(self):
         menubar = tk.Menu(self.root)
