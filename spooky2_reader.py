@@ -12,14 +12,192 @@ import os.path as path
 import re
 
 # global variables
-tree_columns = ("match", "value", "database")
-tree_data = []
-tree_search = []
-tree = None
-match = {}
-matchFirst = {}
-fileGlobal = ""
-version = "1.4.0"
+# tree_columns = ("match", "value", "database")
+# tree_data = []
+# tree_search = []
+# tree = None
+# match = {}
+# matchFirst = {}
+# fileGlobal = ""
+VERSION = "1.4.0"
+
+# Classes
+class BfbClass():
+    """ BFB class """
+
+    def __init__(self) -> None:
+        self.tree_columns = ("match", "value", "database")
+        self.tree_data = []
+        self.tree_search = []
+        self.tree = None
+        self.match = {}
+        self.match_list = []
+        self.matchFirst = {}
+        self.file_list = []
+        self.full_filename_list = []
+
+
+class CustomNotebook(ttk.Notebook):
+    """A ttk Notebook with close buttons on each tab"""
+
+    __initialized = False
+
+    def __init__(self, *args, **kwargs):
+        if not self.__initialized:
+            self.__initialize_custom_style()
+            self.__inititialized = True
+
+        kwargs["style"] = "CustomNotebook"
+        ttk.Notebook.__init__(self, *args, **kwargs)
+
+        self._active = None
+
+        self.bind("<ButtonPress-1>", self.on_close_press, True)
+        self.bind("<ButtonRelease-1>", self.on_close_release)
+
+    def on_close_press(self, event):
+        """Called when the button is pressed over the close button"""
+
+        element = self.identify(event.x, event.y)
+
+        if "close" in element:
+            index = self.index("@%d,%d" % (event.x, event.y))
+            self.state(['pressed'])
+            self._active = index
+            return "break"
+
+    def on_close_release(self, event):
+        """Called when the button is released"""
+        if not self.instate(['pressed']):
+            return
+
+        element =  self.identify(event.x, event.y)
+        if "close" not in element:
+            # user moved the mouse off of the close button
+            return
+
+        index = self.index("@%d,%d" % (event.x, event.y))
+
+        if self._active == index:
+            self.forget(index)
+            self.event_generate("<<NotebookTabClosed>>")
+
+        self.state(["!pressed"])
+        self._active = None
+
+    def __initialize_custom_style(self):
+        style = ttk.Style()
+        self.images = (
+            tk.PhotoImage("img_close", data='''
+                R0lGODlhCAAIAMIBAAAAADs7O4+Pj9nZ2Ts7Ozs7Ozs7Ozs7OyH+EUNyZWF0ZWQg
+                d2l0aCBHSU1QACH5BAEKAAQALAAAAAAIAAgAAAMVGDBEA0qNJyGw7AmxmuaZhWEU
+                5kEJADs=
+                '''),
+            tk.PhotoImage("img_closeactive", data='''
+                R0lGODlhCAAIAMIEAAAAAP/SAP/bNNnZ2cbGxsbGxsbGxsbGxiH5BAEKAAQALAAA
+                AAAIAAgAAAMVGDBEA0qNJyGw7AmxmuaZhWEU5kEJADs=
+                '''),
+            tk.PhotoImage("img_closepressed", data='''
+                R0lGODlhCAAIAMIEAAAAAOUqKv9mZtnZ2Ts7Ozs7Ozs7Ozs7OyH+EUNyZWF0ZWQg
+                d2l0aCBHSU1QACH5BAEKAAQALAAAAAAIAAgAAAMVGDBEA0qNJyGw7AmxmuaZhWEU
+                5kEJADs=
+            ''')
+        )
+
+        style.element_create("close", "image", "img_close",
+                            ("active", "pressed", "!disabled", "img_closepressed"),
+                            ("active", "!disabled", "img_closeactive"), border=8, sticky='')
+        style.layout("CustomNotebook", [("CustomNotebook.client", {"sticky": "nswe"})])
+        style.layout("CustomNotebook.Tab", [
+            ("CustomNotebook.tab", {
+                "sticky": "nswe",
+                "children": [
+                    ("CustomNotebook.padding", {
+                        "side": "top",
+                        "sticky": "nswe",
+                        "children": [
+                            ("CustomNotebook.focus", {
+                                "side": "top",
+                                "sticky": "nswe",
+                                "children": [
+                                    ("CustomNotebook.label", {"side": "left", "sticky": ''}),
+                                    ("CustomNotebook.close", {"side": "left", "sticky": ''}),
+                                ]
+                        })
+                    ]
+                })
+            ]
+        })
+    ])
+
+
+class MenuFuncs():
+    """ Menu functions class"""
+    
+    def openFile(parentWindow, bfb):
+        global fileGlobal, match
+
+        filetypes = (('text files', '*.txt'), ('All files', '*.*'))
+        full_filenames = fd.askopenfilenames(title='Open a report', filetypes=filetypes)
+        if full_filenames == '':
+            return
+        parentWindow.config(cursor="watch")
+        for file_name in full_filenames:
+            file = path.basename(file_name)
+            bfb.file_list.append(file)
+            bfb.full_filename_list.append(file_name)
+            file = file[:file.rfind('.')]
+            file = file[:6] + '...' if len(file) > 6 else file
+            #parentWindow.wm_title("SRL Reader: " + file)
+            #self.frame_abas.append(Frame(self.abas))
+            #self.abas.add(self.frame_abas[-1], text=file)
+            frame_abas = Frame(self.abas)
+            parentWindow.abas.add(frame_abas, text=file)
+            #self.frame_abas[-1].bind('Activate', parentWindow.wm_title(file))
+            lines = bfb.readfile(file_name)
+            match1, match2 = bfb.createDict(lines)
+            tree_reg = bfb.loadTree()
+            #self.build_tree(tree)
+        #pb.destroy()
+        parentWindow.config(cursor="arrow")
+            
+        # fileGlobal = filename[:]
+        # lines = readfile(filename)
+        # createDict(lines)
+        # if tree != None:
+        #     delete_tree()
+        # loadTree(match)
+        # build_tree(tree)
+        # file = path.basename(filename)
+        # parentWindow.wm_title("SRL Reader: " + file)
+        return
+
+    def exportCsv():
+        global fileGlobal, match
+
+        if fileGlobal == '':
+            return
+        filename = fileGlobal[:-3] + "csv"
+        initial_path = path.dirname(filename)
+        file = path.basename(filename)
+        filetypes = (('CSV files', '*.csv'), ('text files', '*.txt'), ('All files', '*.*'))
+        filename = fd.asksaveasfilename(title='Export CSV', filetypes=filetypes,
+                                        initialfile=file, initialdir=initial_path)
+        if filename == '':
+            return
+        with open(filename, 'w') as f:
+            for key, value in sorted(match.items()):
+                ind = key.rfind("(")
+                database = key[ind + 1:-1]
+                line = key[:ind - 1]
+                f.writelines(line + ";" + str(value) + ";" + database + "\n")
+        return
+    
+    def about():
+        msg = "Spooky2 Reverse Lookup Reader\n\nVersion: " + VERSION 
+        msg = msg + "\n\nEnergia e Amor\nhttp://www.energiaeamor.com\n\nCopyright (C) 2022 Skybion"
+        Tkinter.messagebox.showinfo(title="About", message=msg)
+        return
 
 
 def sortby(tree, col, descending):
@@ -209,45 +387,6 @@ def loadTreeSearch(word):
     return aux
 
 
-def openFile(parentWindow):
-    global fileGlobal, match
-
-    filetypes = (('text files', '*.txt'), ('All files', '*.*'))
-    filename = fd.askopenfilename(title='Open a report', filetypes=filetypes)
-    if filename == '':
-        return
-    fileGlobal = filename[:]
-    lines = readfile(filename)
-    createDict(lines)
-    if tree != None:
-        delete_tree()
-    loadTree(match)
-    build_tree(tree)
-    file = path.basename(filename)
-    parentWindow.wm_title("SRL Reader: " + file)
-
-
-def exportCsv():
-    global fileGlobal, match
-
-    if fileGlobal == '':
-        return
-    filename = fileGlobal[:-3] + "csv"
-    initial_path = path.dirname(filename)
-    file = path.basename(filename)
-    filetypes = (('CSV files', '*.csv'), ('text files', '*.txt'), ('All files', '*.*'))
-    filename = fd.asksaveasfilename(title='Export CSV', filetypes=filetypes,
-                                    initialfile=file, initialdir=initial_path)
-    if filename == '':
-        return
-    with open(filename, 'w') as f:
-        for key, value in sorted(match.items()):
-            ind = key.rfind("(")
-            database = key[ind + 1:-1]
-            line = key[:ind - 1]
-            f.writelines(line + ";" + str(value) + ";" + database + "\n")
-
-
 def searchStr(parentWindow):
     global fileGlobal
 
@@ -298,15 +437,12 @@ def copy_from_treeview(parentWindow):
     parentWindow.update() 
 
 
-def about():
-    msg = "Spooky2 Reverse Lookup Reader\n\nVersion: " + version 
-    msg = msg + "\n\nEnergia e Amor\nhttp://www.energiaeamor.com\n\nCopyright (C) 2022 Skybion"
-    Tkinter.messagebox.showinfo(title="About", message=msg)
-    return
-
-
+# Main
 def main():
     global tree
+
+    bfb = BfbClass()
+    menu = MenuFuncs()
 
     root = Tkinter.Tk()
     root.wm_title("Spooky2 RL Reader")
@@ -317,8 +453,8 @@ def main():
 
     filemenu = Tkinter.Menu(menubar)
     menubar.add_cascade(label="File", menu=filemenu)
-    filemenu.add_command(label="Open (Ctrl+O)", command=lambda: openFile(root))
-    filemenu.add_command(label="Export as CSV", command=lambda: exportCsv())
+    filemenu.add_command(label="Open (Ctrl+O)", command=lambda: menu.openFile(root, bfb))
+    filemenu.add_command(label="Export as CSV", command=lambda: menu.exportCsv())
     filemenu.add_separator()
     filemenu.add_command(label="Exit", command=root.quit)
 
@@ -331,7 +467,7 @@ def main():
     editmenu.add_separator()
     editmenu.add_command(label="Clean", command=lambda: clearAll(root))
 
-    root.bind("<Control-Key-o>", lambda x: openFile(root))
+    root.bind("<Control-Key-o>", lambda x: menu.openFile(root, bfb))
     root.bind("<Control-Key-c>", lambda x: copy_from_treeview(root))
     root.bind("<Control-Key-f>", lambda x: searchStr(root))
     root.bind("<Control-Key-r>", lambda x: clearSearch())
@@ -339,7 +475,7 @@ def main():
 
     helpmenu = Tkinter.Menu(menubar)
     menubar.add_cascade(label="Help", menu=helpmenu)
-    helpmenu.add_command(label="About", command=lambda: about())
+    helpmenu.add_command(label="About", command=lambda: menu.about())
 
     root.option_add('*Dialog.msg.font', 'Helvica 11')
     
