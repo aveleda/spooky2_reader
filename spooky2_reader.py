@@ -35,6 +35,7 @@ class BfbClass():
         self.matchFirst = {}
         self.file_list = []
         self.full_filename_list = []
+        self.fileGlobal = ""
 
 
 class CustomNotebook(ttk.Notebook):
@@ -134,50 +135,83 @@ class CustomNotebook(ttk.Notebook):
 class MenuFuncs():
     """ Menu functions class"""
     
-    def openFile(parentWindow, bfb):
-        global fileGlobal, match
+    def __init__(self, menubar, parent, bfb) -> None:
+        self.parent = parent
+        self.bfb = bfb
+        # File menu
+        filemenu = Tkinter.Menu(menubar)
+        menubar.add_cascade(label="File", menu=filemenu)
+        filemenu.add_command(label="Open (Ctrl+O)", command=lambda: self.open_file())
+        filemenu.add_command(label="Export as CSV", command=lambda: self.export_csv())
+        filemenu.add_separator()
+        filemenu.add_command(label="Exit", command=parent.quit)
+        # Edit Menu
+        editmenu = Tkinter.Menu(menubar)
+        menubar.add_cascade(label="Edit", menu=editmenu)
+        editmenu.add_command(label="Copy (Ctrl+C)", command=lambda: self.copy_from_treeview())
+        editmenu.add_separator()
+        editmenu.add_command(label="Find (Ctrl+F)", command=lambda: self.search_str())
+        editmenu.add_command(label="Reset Find (Ctrl+R)", command=lambda: self.clear_search())
+        editmenu.add_separator()
+        editmenu.add_command(label="Clean", command=lambda: self.clear_all())
+        # Help menu
+        helpmenu = Tkinter.Menu(menubar)
+        menubar.add_cascade(label="Help", menu=helpmenu)
+        helpmenu.add_command(label="About", command=lambda: self.about())
+        # bind
+        parent.bind("<Control-Key-o>", lambda x: self.open_file())
+        parent.bind("<Control-Key-c>", lambda x: self.copy_from_treeview())
+        parent.bind("<Control-Key-f>", lambda x: self.search_str())
+        parent.bind("<Control-Key-r>", lambda x: self.clear_search())
+
+    def open_file(self):
+        #global fileGlobal, match
 
         filetypes = (('text files', '*.txt'), ('All files', '*.*'))
-        full_filenames = fd.askopenfilenames(title='Open a report', filetypes=filetypes)
-        if full_filenames == '':
-            return
-        parentWindow.config(cursor="watch")
-        for file_name in full_filenames:
-            file = path.basename(file_name)
-            bfb.file_list.append(file)
-            bfb.full_filename_list.append(file_name)
-            file = file[:file.rfind('.')]
-            file = file[:6] + '...' if len(file) > 6 else file
-            #parentWindow.wm_title("SRL Reader: " + file)
-            #self.frame_abas.append(Frame(self.abas))
-            #self.abas.add(self.frame_abas[-1], text=file)
-            frame_abas = Frame(self.abas)
-            parentWindow.abas.add(frame_abas, text=file)
-            #self.frame_abas[-1].bind('Activate', parentWindow.wm_title(file))
-            lines = bfb.readfile(file_name)
-            match1, match2 = bfb.createDict(lines)
-            tree_reg = bfb.loadTree()
-            #self.build_tree(tree)
-        #pb.destroy()
-        parentWindow.config(cursor="arrow")
+
+        filename = fd.askopenfilename(title='Open a report', filetypes=filetypes)
+        if filename == '':
+             return
+
+        # full_filenames = fd.askopenfilenames(title='Open a report', filetypes=filetypes)
+        # if full_filenames == '':
+        #     return
+        #parentWindow.config(cursor="watch")
+        # for file_name in full_filenames:
+        #     file = path.basename(file_name)
+        #     bfb.file_list.append(file)
+        #     bfb.full_filename_list.append(file_name)
+        #     file = file[:file.rfind('.')]
+        #     file = file[:6] + '...' if len(file) > 6 else file
+        #     #parentWindow.wm_title("SRL Reader: " + file)
+        #     #self.frame_abas.append(Frame(self.abas))
+        #     #self.abas.add(self.frame_abas[-1], text=file)
+        #     frame_abas = Frame(self.abas)
+        #     parentWindow.abas.add(frame_abas, text=file)
+        #     #self.frame_abas[-1].bind('Activate', parentWindow.wm_title(file))
+        #     lines = bfb.readfile(file_name)
+        #     match1, match2 = bfb.createDict(lines)
+        #     tree_reg = bfb.loadTree()
+        #     #self.build_tree(tree)
+        # #pb.destroy()
+        # parentWindow.config(cursor="arrow")
             
-        # fileGlobal = filename[:]
-        # lines = readfile(filename)
-        # createDict(lines)
-        # if tree != None:
-        #     delete_tree()
-        # loadTree(match)
-        # build_tree(tree)
-        # file = path.basename(filename)
-        # parentWindow.wm_title("SRL Reader: " + file)
-        return
+        self.bfb.fileGlobal = filename[:]
+        lines = readfile(filename)
+        createDict(lines)
+        if tree != None:
+            delete_tree()
+        loadTree(match)
+        build_tree(tree)
+        file = path.basename(filename)
+        self.parent.wm_title("SRL Reader: " + file)
 
-    def exportCsv():
-        global fileGlobal, match
+    def export_csv(self):
+        #global fileGlobal, match
 
-        if fileGlobal == '':
+        if self.bfb.fileGlobal == '':
             return
-        filename = fileGlobal[:-3] + "csv"
+        filename = self.bfb.fileGlobal[:-3] + "csv"
         initial_path = path.dirname(filename)
         file = path.basename(filename)
         filetypes = (('CSV files', '*.csv'), ('text files', '*.txt'), ('All files', '*.*'))
@@ -191,15 +225,59 @@ class MenuFuncs():
                 database = key[ind + 1:-1]
                 line = key[:ind - 1]
                 f.writelines(line + ";" + str(value) + ";" + database + "\n")
-        return
-    
-    def about():
+
+    def copy_from_treeview(self):
+        if self.bfb.fileGlobal == '':
+            return
+            
+        curItem = tree.focus()
+        #curItem = tree.selection()[0]
+        
+        self.parent.clipboard_clear()
+        aux = list(tree.item(curItem).values())
+        #seld.parent.clipboard_append(aux[2][0])
+        aux = aux[2][0].lstrip()
+        self.parent.clipboard_append(aux)
+        self.parent.update()
+
+    def search_str(self):
+        if self.bfb.fileGlobal == '':
+            return
+        ctl = True
+        while ctl:
+            answer = Tkinter.simpledialog.askstring("Search", "Find what:",
+                                    parent=self.parent)
+            if (answer is None):
+                return
+            answer = answer.strip()
+            if loadTreeSearch(answer):
+                ctl = False
+                build_tree_search(tree)
+            else:
+                noFind(answer)
+
+    def clear_search(self):
+        global fileGlobal
+
+        if fileGlobal == '':
+            return
+        build_tree(tree)
+ 
+    def clear_all(self):
+        #global match, matchFirst, fileGlobal, tree_data
+        match.clear()
+        matchFirst.clear()
+        self.bfb.tree_data.clear()
+        self.fileGlobal = ""
+        delete_tree()
+        self.parent.wm_title("Spooky2 RL Reader")
+
+    def about(self):
         msg = "Spooky2 Reverse Lookup Reader\n\nVersion: " + VERSION 
         msg = msg + "\n\nEnergia e Amor\nhttp://www.energiaeamor.com\n\nCopyright (C) 2022 Skybion"
         Tkinter.messagebox.showinfo(title="About", message=msg)
-        return
 
-
+# Functions
 def sortby(tree, col, descending):
     """Sort tree contents when a column is clicked on."""
     # grab values to sort
@@ -218,12 +296,12 @@ def sortby(tree, col, descending):
         command=lambda col=col: sortby(tree, col, int(not descending)))
 
 
-def setup_widgets():
+def setup_widgets(columns):
     container = ttk.Frame()
     container.pack(fill='both', expand=True)
 
     # treeview with scrollbars
-    tree = ttk.Treeview(columns=tree_columns, show="headings")
+    tree = ttk.Treeview(columns=columns, show="headings")
     vsb = ttk.Scrollbar(orient="vertical", command=tree.yview)
     hsb = ttk.Scrollbar(orient="horizontal", command=tree.xview)
     tree.configure(yscrollcommand=vsb.set, xscrollcommand=hsb.set)
@@ -314,15 +392,6 @@ def delete_tree():
     #     tree.delete(i)
 
 
-def clearAll(parentWindow):
-    global match, matchFirst, fileGlobal, tree_data
-    match.clear()
-    matchFirst.clear()
-    tree_data.clear()
-    fileGlobal = ""
-    delete_tree()
-    parentWindow.wm_title("Spooky2 RL Reader")
-
 
 def readfile(filename):
     with open(filename, encoding="ISO-8859-1") as f:
@@ -387,101 +456,52 @@ def loadTreeSearch(word):
     return aux
 
 
-def searchStr(parentWindow):
-    global fileGlobal
-
-    if fileGlobal == '':
-        return
-    ctl = True
-    while ctl:
-        answer = Tkinter.simpledialog.askstring("Search", "Find what:",
-                                parent=parentWindow)
-        if (answer is None):
-            return
-        answer = answer.strip()
-        if loadTreeSearch(answer):
-            ctl = False
-            build_tree_search(tree)
-        else:
-            noFind(answer)
-    return
-
-
 def noFind(msg):
     Tkinter.messagebox.showerror("Search", "Can't find the text:\n\"" + msg + "\"")
 
 
-def clearSearch():
-    global fileGlobal
-
-    if fileGlobal == '':
-        return
-    build_tree(tree)
-    return
-
-
-def copy_from_treeview(parentWindow):
-    global fileGlobal
-
-    if fileGlobal == '':
-        return
-        
-    curItem = tree.focus()
-    #curItem = tree.selection()[0]
-    
-    parentWindow.clipboard_clear()
-    aux = list(tree.item(curItem).values())
-    #parentWindow.clipboard_append(aux[2][0])
-    aux = aux[2][0].lstrip()
-    parentWindow.clipboard_append(aux)
-    parentWindow.update() 
-
-
 # Main
 def main():
-    global tree
 
     bfb = BfbClass()
-    menu = MenuFuncs()
-
+    
     root = Tkinter.Tk()
     root.wm_title("Spooky2 RL Reader")
     root.geometry("800x600")
 
     menubar = Tkinter.Menu(root)
     root.config(menu=menubar)
-
-    filemenu = Tkinter.Menu(menubar)
-    menubar.add_cascade(label="File", menu=filemenu)
-    filemenu.add_command(label="Open (Ctrl+O)", command=lambda: menu.openFile(root, bfb))
-    filemenu.add_command(label="Export as CSV", command=lambda: menu.exportCsv())
-    filemenu.add_separator()
-    filemenu.add_command(label="Exit", command=root.quit)
-
-    editmenu = Tkinter.Menu(menubar)
-    menubar.add_cascade(label="Edit", menu=editmenu)
-    editmenu.add_command(label="Copy (Ctrl+C)", command=lambda: copy_from_treeview(root))
-    editmenu.add_separator()
-    editmenu.add_command(label="Find (Ctrl+F)", command=lambda: searchStr(root))
-    editmenu.add_command(label="Reset Find (Ctrl+R)", command=lambda: clearSearch())
-    editmenu.add_separator()
-    editmenu.add_command(label="Clean", command=lambda: clearAll(root))
-
-    root.bind("<Control-Key-o>", lambda x: menu.openFile(root, bfb))
-    root.bind("<Control-Key-c>", lambda x: copy_from_treeview(root))
-    root.bind("<Control-Key-f>", lambda x: searchStr(root))
-    root.bind("<Control-Key-r>", lambda x: clearSearch())
-
-
-    helpmenu = Tkinter.Menu(menubar)
-    menubar.add_cascade(label="Help", menu=helpmenu)
-    helpmenu.add_command(label="About", command=lambda: menu.about())
-
     root.option_add('*Dialog.msg.font', 'Helvica 11')
+    menu = MenuFuncs(menubar, root, bfb)
     
+    # filemenu = Tkinter.Menu(menubar)
+    # menubar.add_cascade(label="File", menu=filemenu)
+    # filemenu.add_command(label="Open (Ctrl+O)", command=lambda: openFile(root))
+    # filemenu.add_command(label="Export as CSV", command=lambda: exportCsv())
+    # filemenu.add_separator()
+    # filemenu.add_command(label="Exit", command=root.quit)
+
+    # editmenu = Tkinter.Menu(menubar)
+    # menubar.add_cascade(label="Edit", menu=editmenu)
+    # editmenu.add_command(label="Copy (Ctrl+C)", command=lambda: copy_from_treeview(root))
+    # editmenu.add_separator()
+    # editmenu.add_command(label="Find (Ctrl+F)", command=lambda: searchStr(root))
+    # editmenu.add_command(label="Reset Find (Ctrl+R)", command=lambda: clearSearch())
+    # editmenu.add_separator()
+    # editmenu.add_command(label="Clean", command=lambda: clearAll(root))
+
+    # root.bind("<Control-Key-o>", lambda x: openFile(root))
+    # root.bind("<Control-Key-c>", lambda x: copy_from_treeview(root))
+    # root.bind("<Control-Key-f>", lambda x: searchStr(root))
+    # root.bind("<Control-Key-r>", lambda x: clearSearch())
+
+    # helpmenu = Tkinter.Menu(menubar)
+    # menubar.add_cascade(label="Help", menu=helpmenu)
+    # helpmenu.add_command(label="About", command=lambda: about())
+
     #root.wm_iconname("mclist")
 
-    tree = setup_widgets()
+    bfb.tree = setup_widgets(bfb.tree_columns)
     root.mainloop()
 
 if __name__ == "__main__":
