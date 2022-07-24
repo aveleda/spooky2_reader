@@ -9,6 +9,7 @@
 ## Release
 | Release | New Features |
 | ------- | ------------ |
+| 1.4.x | Rewrite code with new classes |
 | 1.3.x | Added Copy menu and shortcuts |
 | 1.2.x | Added Find and Reset Find menu|
 | 1.1.x| Show file name on the window title|
