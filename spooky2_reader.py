@@ -121,7 +121,7 @@ class BfbClass():
         self.delete_tree()
         for col in self.tree_columns:
             tree.heading(col, text=col.title(),
-                command=lambda c=col: sortby(tree, c, 0))
+                command=lambda c=col: self.sortby(tree, c, 0))
             # tkFont.Font().measure expected args are incorrect according
             #     to the Tk docs
             tree.column(col, width=tkFont.Font().measure(col.title()))
@@ -395,7 +395,7 @@ class MenuFuncs():
         self.bfb.match.clear()
         self.bfb.matchFirst.clear()
         self.bfb.tree_data.clear()
-        self.fileGlobal = ""
+        self.bfb.fileGlobal = ""
         self.bfb.delete_tree()
         self.parent.wm_title("Spooky2 RL Reader")
 
