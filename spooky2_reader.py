@@ -39,15 +39,15 @@ class BfbClass():
     
     def createDict(self, lines):
         #global match, matchFirst
-        match.clear()
+        self.match.clear()
         self.matchFirst.clear()
         for line in lines:
             indice = line.rfind("(")
             if (indice > 0) and (line.rfind("(SD)") == -1) and (line.rfind("(MW)") == -1):
                 if line.rfind("Hz") > 0:
                     line = line[:indice-1]
-                previousCount = match.get(line, 0)
-                match[line] = previousCount + 1
+                previousCount = self.match.get(line, 0)
+                self.match[line] = previousCount + 1
                 # first name
                 lineFirst = line.split()[0]
                 if lineFirst[-1] == ",":
@@ -82,7 +82,7 @@ class BfbClass():
         self.delete_tree()
         for col in self.tree_columns:
             tree.heading(col, text=col.title(),
-                command=lambda c=col: sortby(tree, c, 0))
+                command=lambda c=col: self.sortby(tree, c, 0))
             # tkFont.Font().measure expected args are incorrect according
             #     to the Tk docs
             tree.column(col, width=tkFont.Font().measure(col.title()))
@@ -326,10 +326,10 @@ class MenuFuncs():
         self.bfb.fileGlobal = filename[:]
         lines = self.readfile(filename)
         self.bfb.createDict(lines)
-        if tree != None:
-            delete_tree()
-        self.bfb.loadTree(match)
-        self.bfb.build_tree(tree)
+        if self.bfb.tree != None:
+            self.bfb.delete_tree()
+        self.bfb.loadTree(self.bfb.match)
+        self.bfb.build_tree(self.bfb.tree)
         file = path.basename(filename)
         self.parent.wm_title("SRL Reader: " + file)
 
@@ -347,7 +347,7 @@ class MenuFuncs():
         if filename == '':
             return
         with open(filename, 'w') as f:
-            for key, value in sorted(match.items()):
+            for key, value in sorted(self.bfb.match.items()):
                 ind = key.rfind("(")
                 database = key[ind + 1:-1]
                 line = key[:ind - 1]
@@ -357,11 +357,11 @@ class MenuFuncs():
         if self.bfb.fileGlobal == '':
             return
             
-        curItem = tree.focus()
+        curItem = self.bfb.tree.focus()
         #curItem = tree.selection()[0]
         
         self.parent.clipboard_clear()
-        aux = list(tree.item(curItem).values())
+        aux = list(self.bfb.tree.item(curItem).values())
         #seld.parent.clipboard_append(aux[2][0])
         aux = aux[2][0].lstrip()
         self.parent.clipboard_append(aux)
@@ -392,7 +392,7 @@ class MenuFuncs():
  
     def clear_all(self):
         #global match, matchFirst, fileGlobal, tree_data
-        match.clear()
+        self.bfb.match.clear()
         self.bfb.matchFirst.clear()
         self.bfb.tree_data.clear()
         self.fileGlobal = ""
