@@ -36,8 +36,135 @@ class BfbClass():
         self.file_list = []
         self.full_filename_list = []
         self.fileGlobal = ""
+    
+    def createDict(self, lines):
+        #global match, matchFirst
+        match.clear()
+        self.matchFirst.clear()
+        for line in lines:
+            indice = line.rfind("(")
+            if (indice > 0) and (line.rfind("(SD)") == -1) and (line.rfind("(MW)") == -1):
+                if line.rfind("Hz") > 0:
+                    line = line[:indice-1]
+                previousCount = match.get(line, 0)
+                match[line] = previousCount + 1
+                # first name
+                lineFirst = line.split()[0]
+                if lineFirst[-1] == ",":
+                    lineFirst = lineFirst[:-1]
+                previousCount = self.matchFirst.get(lineFirst, 0)
+                self.matchFirst[lineFirst] = previousCount + 1
 
+    def loadTree(self, varDict):
+        self.tree_data.clear()
+        for key, value in sorted(varDict.items()):
+            ind = key.rfind("(")
+            database = key[ind + 1:-1]
+            line = key[:ind - 1]
+            reg = (line, str(value), database)
+            self.tree_data.append(reg)
 
+    def loadTreeSearch(self, word):
+        #global match
+        self.tree_search.clear()
+        aux = False
+        for key, value in sorted(self.match.items()):
+            ind = key.rfind("(")
+            database = key[ind + 1:-1]
+            line = key[:ind - 1]
+            if word.lower() in key.lower(): 
+                reg = (line, str(value), database)
+                self.tree_search.append(reg)
+                aux = True
+        return aux
+        
+    def build_tree(self, tree):
+        self.delete_tree()
+        for col in self.tree_columns:
+            tree.heading(col, text=col.title(),
+                command=lambda c=col: sortby(tree, c, 0))
+            # tkFont.Font().measure expected args are incorrect according
+            #     to the Tk docs
+            tree.column(col, width=tkFont.Font().measure(col.title()))
+
+        last = ""
+        for item in self.tree_data:
+            aux = item[0]
+            auxFull = aux + " (" + item[2] + ")"
+            auxFirst = aux.split()[0]
+            #if auxFirst[-1] == ",":
+            #    auxFirst = auxFirst[:-1]
+            if int(self.matchFirst[auxFirst]) > int(self.match[auxFull]):
+                if last == auxFirst:
+                    aux = item[0]
+                    aux = "     " + aux
+                    reg = (aux, item[1], item[2])
+                    tree.insert(folder, 'end', open=False, values=reg, tags='rowInsideFolder')
+                else:
+                    last = auxFirst
+                    reg = (auxFirst, str(self.matchFirst[auxFirst]), '')
+                    folder = tree.insert('', 'end', open=False, values=reg, tags='rowFolder')
+                    aux = item[0]
+                    aux = "     " + aux
+                    reg = (aux, item[1], item[2])
+                    tree.insert(folder, 'end', open=False, values=reg, tags='rowInsideFolder')
+            else:
+                tree.insert('', 'end', open=False, values=item)
+
+            # adjust columns lenghts if necessary
+            for indx, val in enumerate(item):
+                ilen = tkFont.Font().measure(val)
+                if tree.column(self.tree_columns[indx], width=None) < ilen:
+                    tree.column(self.tree_columns[indx], width=ilen)
+
+    def build_tree_search(self, tree):
+        self.delete_tree()
+        for col in self.tree_columns:
+            tree.heading(col, text=col.title(),
+                command=lambda c=col: sortby(tree, c, 0))
+            # tkFont.Font().measure expected args are incorrect according
+            #     to the Tk docs
+            tree.column(col, width=tkFont.Font().measure(col.title()))
+
+        last = ""
+        for item in self.tree_search:
+            aux = item[0]
+            auxFull = aux + " (" + item[2] + ")"
+            auxFirst = aux.split()[0]
+            if auxFirst[-1] == ",":
+                auxFirst = auxFirst[:-1]
+            tree.insert('', 'end', open=False, values=item, tags='rowOutsideFolder')
+
+            # adjust columns lenghts if necessary
+            for indx, val in enumerate(item):
+                ilen = tkFont.Font().measure(val)
+                if tree.column(self.tree_columns[indx], width=None) < ilen:
+                    tree.column(self.tree_columns[indx], width=ilen)
+   
+    def delete_tree(self):
+        #global tree
+        self.tree.delete(*self.tree.get_children())
+        # for i in tree.get_children():
+        #     tree.delete(i)
+
+    def sortby(self, col, descending):
+        """Sort tree contents when a column is clicked on."""
+        # grab values to sort
+        if col == "value":
+            data = [(int(self.tree.set(child, col)), child) for child in self.tree.get_children('')]
+        else:
+            data = [(self.tree.set(child, col), child) for child in self.tree.get_children('')]
+
+        # reorder data
+        data.sort(reverse=descending)
+        for indx, item in enumerate(data):
+            self.tree.move(item[1], '', indx)
+
+        # switch the heading so that it will sort in the opposite direction
+        self.tree.heading(col,
+            command=lambda col=col: self.sortby(col, int(not descending)))
+    
+    
 class CustomNotebook(ttk.Notebook):
     """A ttk Notebook with close buttons on each tab"""
 
@@ -197,12 +324,12 @@ class MenuFuncs():
         # parentWindow.config(cursor="arrow")
             
         self.bfb.fileGlobal = filename[:]
-        lines = readfile(filename)
-        createDict(lines)
+        lines = self.readfile(filename)
+        self.bfb.createDict(lines)
         if tree != None:
             delete_tree()
-        loadTree(match)
-        build_tree(tree)
+        self.bfb.loadTree(match)
+        self.bfb.build_tree(tree)
         file = path.basename(filename)
         self.parent.wm_title("SRL Reader: " + file)
 
@@ -250,26 +377,26 @@ class MenuFuncs():
             if (answer is None):
                 return
             answer = answer.strip()
-            if loadTreeSearch(answer):
+            if self.bfb.loadTreeSearch(answer):
                 ctl = False
-                build_tree_search(tree)
+                self.bfb.build_tree_search(self.bfb.tree)
             else:
-                noFind(answer)
+                self.noFind(answer)
 
     def clear_search(self):
-        global fileGlobal
+        #global fileGlobal
 
-        if fileGlobal == '':
+        if self.bfb.fileGlobal == '':
             return
-        build_tree(tree)
+        self.bfb.build_tree(self.bfb.tree)
  
     def clear_all(self):
         #global match, matchFirst, fileGlobal, tree_data
         match.clear()
-        matchFirst.clear()
+        self.bfb.matchFirst.clear()
         self.bfb.tree_data.clear()
         self.fileGlobal = ""
-        delete_tree()
+        self.bfb.delete_tree()
         self.parent.wm_title("Spooky2 RL Reader")
 
     def about(self):
@@ -277,24 +404,26 @@ class MenuFuncs():
         msg = msg + "\n\nEnergia e Amor\nhttp://www.energiaeamor.com\n\nCopyright (C) 2022 Skybion"
         Tkinter.messagebox.showinfo(title="About", message=msg)
 
-# Functions
-def sortby(tree, col, descending):
-    """Sort tree contents when a column is clicked on."""
-    # grab values to sort
-    if col == "value":
-        data = [(int(tree.set(child, col)), child) for child in tree.get_children('')]
-    else:
-        data = [(tree.set(child, col), child) for child in tree.get_children('')]
+    def readfile(self, filename):
+        with open(filename, encoding="ISO-8859-1") as f:
+            lines = (line.rstrip() for line in f)
+            lines = (line for line in lines if line)
+    #       lines = (line.replace(":", "") for line in lines)
+            lines = (re.sub('[,:]', "", line) for line in lines)
+            lines = list(line for line in lines if line[:3] != "BFB")
+        # remove header
+        line = lines[0]
+        while line[:5] != "-----":
+            lines.pop(0)
+            line = lines[0]
+        lines.pop(0)
+        return lines
 
-    # reorder data
-    data.sort(reverse=descending)
-    for indx, item in enumerate(data):
-        tree.move(item[1], '', indx)
+    def noFind(self, msg):
+        Tkinter.messagebox.showerror("Search", "Can't find the text:\n\"" + msg + "\"")
 
-    # switch the heading so that it will sort in the opposite direction
-    tree.heading(col,
-        command=lambda col=col: sortby(tree, col, int(not descending)))
 
+### Functions
 
 def setup_widgets(columns):
     container = ttk.Frame()
@@ -320,147 +449,7 @@ def setup_widgets(columns):
     return tree
 
 
-def build_tree(tree):
-    delete_tree()
-    for col in tree_columns:
-        tree.heading(col, text=col.title(),
-            command=lambda c=col: sortby(tree, c, 0))
-        # tkFont.Font().measure expected args are incorrect according
-        #     to the Tk docs
-        tree.column(col, width=tkFont.Font().measure(col.title()))
-
-    last = ""
-    for item in tree_data:
-        aux = item[0]
-        auxFull = aux + " (" + item[2] + ")"
-        auxFirst = aux.split()[0]
-        #if auxFirst[-1] == ",":
-        #    auxFirst = auxFirst[:-1]
-        if int(matchFirst[auxFirst]) > int(match[auxFull]):
-            if last == auxFirst:
-                aux = item[0]
-                aux = "     " + aux
-                reg = (aux, item[1], item[2])
-                tree.insert(folder, 'end', open=False, values=reg, tags='rowInsideFolder')
-            else:
-                last = auxFirst
-                reg = (auxFirst, str(matchFirst[auxFirst]), '')
-                folder = tree.insert('', 'end', open=False, values=reg, tags='rowFolder')
-                aux = item[0]
-                aux = "     " + aux
-                reg = (aux, item[1], item[2])
-                tree.insert(folder, 'end', open=False, values=reg, tags='rowInsideFolder')
-        else:
-            tree.insert('', 'end', open=False, values=item)
-
-        # adjust columns lenghts if necessary
-        for indx, val in enumerate(item):
-            ilen = tkFont.Font().measure(val)
-            if tree.column(tree_columns[indx], width=None) < ilen:
-                tree.column(tree_columns[indx], width=ilen)
-
-
-def build_tree_search(tree):
-    delete_tree()
-    for col in tree_columns:
-        tree.heading(col, text=col.title(),
-            command=lambda c=col: sortby(tree, c, 0))
-        # tkFont.Font().measure expected args are incorrect according
-        #     to the Tk docs
-        tree.column(col, width=tkFont.Font().measure(col.title()))
-
-    last = ""
-    for item in tree_search:
-        aux = item[0]
-        auxFull = aux + " (" + item[2] + ")"
-        auxFirst = aux.split()[0]
-        if auxFirst[-1] == ",":
-            auxFirst = auxFirst[:-1]
-        tree.insert('', 'end', open=False, values=item, tags='rowOutsideFolder')
-
-        # adjust columns lenghts if necessary
-        for indx, val in enumerate(item):
-            ilen = tkFont.Font().measure(val)
-            if tree.column(tree_columns[indx], width=None) < ilen:
-                tree.column(tree_columns[indx], width=ilen)
-
-
-def delete_tree():
-    global tree
-    tree.delete(*tree.get_children())
-    # for i in tree.get_children():
-    #     tree.delete(i)
-
-
-
-def readfile(filename):
-    with open(filename, encoding="ISO-8859-1") as f:
-        lines = (line.rstrip() for line in f)
-        lines = (line for line in lines if line)
-#       lines = (line.replace(":", "") for line in lines)
-        lines = (re.sub('[,:]', "", line) for line in lines)
-        lines = list(line for line in lines if line[:3] != "BFB")
-    # remove header
-    line = lines[0]
-    while line[:5] != "-----":
-        lines.pop(0)
-        line = lines[0]
-    lines.pop(0)
-    return lines
-
-
-def createDict(lines):
-    global match, matchFirst
-
-    match.clear()
-    matchFirst.clear()
-    for line in lines:
-        indice = line.rfind("(")
-        if (indice > 0) and (line.rfind("(SD)") == -1) and (line.rfind("(MW)") == -1):
-            if line.rfind("Hz") > 0:
-                line = line[:indice-1]
-            previousCount = match.get(line, 0)
-            match[line] = previousCount + 1
-            # first name
-            lineFirst = line.split()[0]
-            if lineFirst[-1] == ",":
-                lineFirst = lineFirst[:-1]
-            previousCount = matchFirst.get(lineFirst, 0)
-            matchFirst[lineFirst] = previousCount + 1
-    return
-
-
-def loadTree(varDict):
-    tree_data.clear()
-    for key, value in sorted(varDict.items()):
-        ind = key.rfind("(")
-        database = key[ind + 1:-1]
-        line = key[:ind - 1]
-        reg = (line, str(value), database)
-        tree_data.append(reg)
-
-
-def loadTreeSearch(word):
-    global match
-
-    tree_search.clear()
-    aux = False
-    for key, value in sorted(match.items()):
-        ind = key.rfind("(")
-        database = key[ind + 1:-1]
-        line = key[:ind - 1]
-        if word.lower() in key.lower(): 
-            reg = (line, str(value), database)
-            tree_search.append(reg)
-            aux = True
-    return aux
-
-
-def noFind(msg):
-    Tkinter.messagebox.showerror("Search", "Can't find the text:\n\"" + msg + "\"")
-
-
-# Main
+### Main
 def main():
 
     bfb = BfbClass()
