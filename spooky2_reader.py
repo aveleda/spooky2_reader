@@ -4,7 +4,7 @@
 # Spooky2 RL Reader
 # License: GPLv3
 #
-import tkinter as Tkinter
+import tkinter as tk
 import tkinter.font as tkFont
 from tkinter import ttk
 from tkinter import filedialog as fd
@@ -266,14 +266,14 @@ class MenuFuncs():
         self.parent = parent
         self.bfb = bfb
         # File menu
-        filemenu = Tkinter.Menu(menubar)
+        filemenu = tk.Menu(menubar)
         menubar.add_cascade(label="File", menu=filemenu)
         filemenu.add_command(label="Open (Ctrl+O)", command=lambda: self.open_file())
         filemenu.add_command(label="Export as CSV", command=lambda: self.export_csv())
         filemenu.add_separator()
         filemenu.add_command(label="Exit", command=parent.quit)
         # Edit Menu
-        editmenu = Tkinter.Menu(menubar)
+        editmenu = tk.Menu(menubar)
         menubar.add_cascade(label="Edit", menu=editmenu)
         editmenu.add_command(label="Copy (Ctrl+C)", command=lambda: self.copy_from_treeview())
         editmenu.add_separator()
@@ -282,7 +282,7 @@ class MenuFuncs():
         editmenu.add_separator()
         editmenu.add_command(label="Clean", command=lambda: self.clear_all())
         # Help menu
-        helpmenu = Tkinter.Menu(menubar)
+        helpmenu = tk.Menu(menubar)
         menubar.add_cascade(label="Help", menu=helpmenu)
         helpmenu.add_command(label="About", command=lambda: self.about())
         # bind
@@ -372,7 +372,7 @@ class MenuFuncs():
             return
         ctl = True
         while ctl:
-            answer = Tkinter.simpledialog.askstring("Search", "Find what:",
+            answer = tk.simpledialog.askstring("Search", "Find what:",
                                     parent=self.parent)
             if (answer is None):
                 return
@@ -402,7 +402,7 @@ class MenuFuncs():
     def about(self):
         msg = "Spooky2 Reverse Lookup Reader\n\nVersion: " + VERSION 
         msg = msg + "\n\nEnergia e Amor\nhttp://www.energiaeamor.com\n\nCopyright (C) 2022 Skybion"
-        Tkinter.messagebox.showinfo(title="About", message=msg)
+        tk.messagebox.showinfo(title="About", message=msg)
 
     def readfile(self, filename):
         with open(filename, encoding="ISO-8859-1") as f:
@@ -420,7 +420,7 @@ class MenuFuncs():
         return lines
 
     def noFind(self, msg):
-        Tkinter.messagebox.showerror("Search", "Can't find the text:\n\"" + msg + "\"")
+        tk.messagebox.showerror("Search", "Can't find the text:\n\"" + msg + "\"")
 
 
 ### Functions
@@ -454,23 +454,23 @@ def main():
 
     bfb = BfbClass()
     
-    root = Tkinter.Tk()
+    root = tk.Tk()
     root.wm_title("Spooky2 RL Reader")
     root.geometry("800x600")
 
-    menubar = Tkinter.Menu(root)
+    menubar = tk.Menu(root)
     root.config(menu=menubar)
     root.option_add('*Dialog.msg.font', 'Helvica 11')
     menu = MenuFuncs(menubar, root, bfb)
     
-    # filemenu = Tkinter.Menu(menubar)
+    # filemenu = tk.Menu(menubar)
     # menubar.add_cascade(label="File", menu=filemenu)
     # filemenu.add_command(label="Open (Ctrl+O)", command=lambda: openFile(root))
     # filemenu.add_command(label="Export as CSV", command=lambda: exportCsv())
     # filemenu.add_separator()
     # filemenu.add_command(label="Exit", command=root.quit)
 
-    # editmenu = Tkinter.Menu(menubar)
+    # editmenu = tk.Menu(menubar)
     # menubar.add_cascade(label="Edit", menu=editmenu)
     # editmenu.add_command(label="Copy (Ctrl+C)", command=lambda: copy_from_treeview(root))
     # editmenu.add_separator()
@@ -484,7 +484,7 @@ def main():
     # root.bind("<Control-Key-f>", lambda x: searchStr(root))
     # root.bind("<Control-Key-r>", lambda x: clearSearch())
 
-    # helpmenu = Tkinter.Menu(menubar)
+    # helpmenu = tk.Menu(menubar)
     # menubar.add_cascade(label="Help", menu=helpmenu)
     # helpmenu.add_command(label="About", command=lambda: about())
 
