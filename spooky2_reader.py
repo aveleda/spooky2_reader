@@ -12,7 +12,7 @@ import os.path as path
 import re
 
 # global variables
-VERSION = "1.4.0"
+VERSION = "2.0.0"
 
 # Classes
 class BfbClass():
@@ -414,6 +414,62 @@ class MenuFuncs():
 
     def no_find(self, msg):
         tk.messagebox.showerror("Search", "Can't find the text:\n\"" + msg + "\"")
+
+
+class App():
+    """ App class""""
+
+    def __init__(self) -> None:
+        #self.abas = ttk.Notebook(self.root)
+        self.abas = CustomNotebook(self.root)
+        self.abas.place(relx=0, rely=0, relwidth=1, relheight=1)
+        # Cria evento TabChange
+        self.abas.bind("<<NotebookTabChanged>>", self.change_state)
+        self.abas.bind("<<NotebookTabClosed>>", self.close_state)
+        #Create a tooltip
+        #tip = Balloon(self.root)
+        #Bind the tooltip with button
+        #tip.bind_widget(self.abas,balloonmsg="test")
+        #self.abas.bind("<<Enter>>", self.on_enter)
+        #self.abas.bind("<<Leave>>", self.on_leave)
+        #self.abas.pack()
+        self.ws()
+        #self.frames_ws()
+        #self.widgets_frame()
+        self.Menus()
+        # create Loop
+        #root.mainloop()
+
+
+    def ws(self):
+        self.root.title("Spooky2 RL Reader")
+        self.root.configure(background='#1e3743')
+        self.root.geometry("900x600")
+        self.root.resizable(True, True)
+        #self.root.maxsize(width=800, height=700)
+        self.root.minsize(width=500, height=300)
+
+
+    def frames_ws(self):
+        container = ttk.Frame()
+        container.pack(fill='both', expand=True)
+
+
+    def widgets_frame(self):
+        #self.abas = ttk.Notebook(self.root);
+        self.frame_aba1 = Frame(self.abas)
+        self.frame_aba2 = Frame(self.abas)
+
+        self.frame_aba1.configure(background= "gray")
+        self.frame_aba2.configure(background= "lightgray")
+        
+        self.abas.add(self.frame_aba1, text= "Aba 1");
+        self.abas.add(self.frame_aba2, text= "Aba 2")
+        self.abas.place(relx = 0, rely= 0, relwidth = 0.98, relheight = 0.98)
+        #self.abas.pack(side="bottom")
+
+        self.label1 = Label(self.frame_aba1, text="trtrta");
+        self.label1.pack(side = "top")
 
 
 ### Functions
