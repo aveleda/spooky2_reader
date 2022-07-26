@@ -12,13 +12,6 @@ import os.path as path
 import re
 
 # global variables
-# tree_columns = ("match", "value", "database")
-# tree_data = []
-# tree_search = []
-# tree = None
-# match = {}
-# matchFirst = {}
-# fileGlobal = ""
 VERSION = "1.4.0"
 
 # Classes
@@ -32,15 +25,15 @@ class BfbClass():
         self.tree = None
         self.match = {}
         self.match_list = []
-        self.matchFirst = {}
+        self.match_first = {}
         self.file_list = []
         self.full_filename_list = []
         self.fileGlobal = ""
     
-    def createDict(self, lines):
+    def create_dict(self, lines):
         #global match, matchFirst
         self.match.clear()
-        self.matchFirst.clear()
+        self.match_first.clear()
         for line in lines:
             indice = line.rfind("(")
             if (indice > 0) and (line.rfind("(SD)") == -1) and (line.rfind("(MW)") == -1):
@@ -52,10 +45,10 @@ class BfbClass():
                 lineFirst = line.split()[0]
                 if lineFirst[-1] == ",":
                     lineFirst = lineFirst[:-1]
-                previousCount = self.matchFirst.get(lineFirst, 0)
-                self.matchFirst[lineFirst] = previousCount + 1
+                previousCount = self.match_first.get(lineFirst, 0)
+                self.match_first[lineFirst] = previousCount + 1
 
-    def loadTree(self, varDict):
+    def load_tree(self, varDict):
         self.tree_data.clear()
         for key, value in sorted(varDict.items()):
             ind = key.rfind("(")
@@ -64,7 +57,7 @@ class BfbClass():
             reg = (line, str(value), database)
             self.tree_data.append(reg)
 
-    def loadTreeSearch(self, word):
+    def load_tree_search(self, word):
         #global match
         self.tree_search.clear()
         aux = False
@@ -94,7 +87,7 @@ class BfbClass():
             auxFirst = aux.split()[0]
             #if auxFirst[-1] == ",":
             #    auxFirst = auxFirst[:-1]
-            if int(self.matchFirst[auxFirst]) > int(self.match[auxFull]):
+            if int(self.match_first[auxFirst]) > int(self.match[auxFull]):
                 if last == auxFirst:
                     aux = item[0]
                     aux = "     " + aux
@@ -102,7 +95,7 @@ class BfbClass():
                     tree.insert(folder, 'end', open=False, values=reg, tags='rowInsideFolder')
                 else:
                     last = auxFirst
-                    reg = (auxFirst, str(self.matchFirst[auxFirst]), '')
+                    reg = (auxFirst, str(self.match_first[auxFirst]), '')
                     folder = tree.insert('', 'end', open=False, values=reg, tags='rowFolder')
                     aux = item[0]
                     aux = "     " + aux
@@ -316,19 +309,19 @@ class MenuFuncs():
         #     frame_abas = Frame(self.abas)
         #     parentWindow.abas.add(frame_abas, text=file)
         #     #self.frame_abas[-1].bind('Activate', parentWindow.wm_title(file))
-        #     lines = bfb.readfile(file_name)
-        #     match1, match2 = bfb.createDict(lines)
-        #     tree_reg = bfb.loadTree()
+        #     lines = bfb.read_file(file_name)
+        #     match1, match2 = bfb.create_dict(lines)
+        #     tree_reg = bfb.load_tree()
         #     #self.build_tree(tree)
         # #pb.destroy()
         # parentWindow.config(cursor="arrow")
             
         self.bfb.fileGlobal = filename[:]
-        lines = self.readfile(filename)
-        self.bfb.createDict(lines)
+        lines = self.read_file(filename)
+        self.bfb.create_dict(lines)
         if self.bfb.tree != None:
             self.bfb.delete_tree()
-        self.bfb.loadTree(self.bfb.match)
+        self.bfb.load_tree(self.bfb.match)
         self.bfb.build_tree(self.bfb.tree)
         file = path.basename(filename)
         self.parent.wm_title("SRL Reader: " + file)
@@ -377,11 +370,11 @@ class MenuFuncs():
             if (answer is None):
                 return
             answer = answer.strip()
-            if self.bfb.loadTreeSearch(answer):
+            if self.bfb.load_tree_search(answer):
                 ctl = False
                 self.bfb.build_tree_search(self.bfb.tree)
             else:
-                self.noFind(answer)
+                self.no_find(answer)
 
     def clear_search(self):
         #global fileGlobal
@@ -393,7 +386,7 @@ class MenuFuncs():
     def clear_all(self):
         #global match, matchFirst, fileGlobal, tree_data
         self.bfb.match.clear()
-        self.bfb.matchFirst.clear()
+        self.bfb.match_first.clear()
         self.bfb.tree_data.clear()
         self.bfb.fileGlobal = ""
         self.bfb.delete_tree()
@@ -404,7 +397,7 @@ class MenuFuncs():
         msg = msg + "\n\nEnergia e Amor\nhttp://www.energiaeamor.com\n\nCopyright (C) 2022 Skybion"
         tk.messagebox.showinfo(title="About", message=msg)
 
-    def readfile(self, filename):
+    def read_file(self, filename):
         with open(filename, encoding="ISO-8859-1") as f:
             lines = (line.rstrip() for line in f)
             lines = (line for line in lines if line)
@@ -419,7 +412,7 @@ class MenuFuncs():
         lines.pop(0)
         return lines
 
-    def noFind(self, msg):
+    def no_find(self, msg):
         tk.messagebox.showerror("Search", "Can't find the text:\n\"" + msg + "\"")
 
 
@@ -456,38 +449,13 @@ def main():
     
     root = tk.Tk()
     root.wm_title("Spooky2 RL Reader")
-    root.geometry("800x600")
+    root.geometry("900x600")
 
     menubar = tk.Menu(root)
     root.config(menu=menubar)
     root.option_add('*Dialog.msg.font', 'Helvica 11')
     menu = MenuFuncs(menubar, root, bfb)
     
-    # filemenu = tk.Menu(menubar)
-    # menubar.add_cascade(label="File", menu=filemenu)
-    # filemenu.add_command(label="Open (Ctrl+O)", command=lambda: openFile(root))
-    # filemenu.add_command(label="Export as CSV", command=lambda: exportCsv())
-    # filemenu.add_separator()
-    # filemenu.add_command(label="Exit", command=root.quit)
-
-    # editmenu = tk.Menu(menubar)
-    # menubar.add_cascade(label="Edit", menu=editmenu)
-    # editmenu.add_command(label="Copy (Ctrl+C)", command=lambda: copy_from_treeview(root))
-    # editmenu.add_separator()
-    # editmenu.add_command(label="Find (Ctrl+F)", command=lambda: searchStr(root))
-    # editmenu.add_command(label="Reset Find (Ctrl+R)", command=lambda: clearSearch())
-    # editmenu.add_separator()
-    # editmenu.add_command(label="Clean", command=lambda: clearAll(root))
-
-    # root.bind("<Control-Key-o>", lambda x: openFile(root))
-    # root.bind("<Control-Key-c>", lambda x: copy_from_treeview(root))
-    # root.bind("<Control-Key-f>", lambda x: searchStr(root))
-    # root.bind("<Control-Key-r>", lambda x: clearSearch())
-
-    # helpmenu = tk.Menu(menubar)
-    # menubar.add_cascade(label="Help", menu=helpmenu)
-    # helpmenu.add_command(label="About", command=lambda: about())
-
     #root.wm_iconname("mclist")
 
     bfb.tree = setup_widgets(bfb.tree_columns)
