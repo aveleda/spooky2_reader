@@ -7,14 +7,15 @@
 import tkinter as tk
 import tkinter.font as tkFont
 from tkinter import ttk
+from tkinter import Frame, Label
 from tkinter import filedialog as fd
 import os.path as path
 import re
 
-# global variables
+### global variables
 VERSION = "2.0.0"
 
-# Classes
+### Classes
 class BfbClass():
     """ BFB class """
 
@@ -417,7 +418,7 @@ class MenuFuncs():
 
 
 class App():
-    """ App class""""
+    """ App class"""
 
     def __init__(self) -> None:
         #self.abas = ttk.Notebook(self.root)
