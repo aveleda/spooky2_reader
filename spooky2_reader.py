@@ -16,6 +16,12 @@ import re
 VERSION = "2.0.0"
 
 ### Classes
+
+class AbaClass():
+    """ Aba class """
+    def __init__(self) -> None:
+        pass
+
 class BfbClass():
     """ BFB class """
 
@@ -159,99 +165,6 @@ class BfbClass():
             command=lambda col=col: self.sortby(col, int(not descending)))
     
     
-class CustomNotebook(ttk.Notebook):
-    """A ttk Notebook with close buttons on each tab"""
-
-    __initialized = False
-
-    def __init__(self, *args, **kwargs):
-        if not self.__initialized:
-            self.__initialize_custom_style()
-            self.__inititialized = True
-
-        kwargs["style"] = "CustomNotebook"
-        ttk.Notebook.__init__(self, *args, **kwargs)
-
-        self._active = None
-
-        self.bind("<ButtonPress-1>", self.on_close_press, True)
-        self.bind("<ButtonRelease-1>", self.on_close_release)
-
-    def on_close_press(self, event):
-        """Called when the button is pressed over the close button"""
-
-        element = self.identify(event.x, event.y)
-
-        if "close" in element:
-            index = self.index("@%d,%d" % (event.x, event.y))
-            self.state(['pressed'])
-            self._active = index
-            return "break"
-
-    def on_close_release(self, event):
-        """Called when the button is released"""
-        if not self.instate(['pressed']):
-            return
-
-        element =  self.identify(event.x, event.y)
-        if "close" not in element:
-            # user moved the mouse off of the close button
-            return
-
-        index = self.index("@%d,%d" % (event.x, event.y))
-
-        if self._active == index:
-            self.forget(index)
-            self.event_generate("<<NotebookTabClosed>>")
-
-        self.state(["!pressed"])
-        self._active = None
-
-    def __initialize_custom_style(self):
-        style = ttk.Style()
-        self.images = (
-            tk.PhotoImage("img_close", data='''
-                R0lGODlhCAAIAMIBAAAAADs7O4+Pj9nZ2Ts7Ozs7Ozs7Ozs7OyH+EUNyZWF0ZWQg
-                d2l0aCBHSU1QACH5BAEKAAQALAAAAAAIAAgAAAMVGDBEA0qNJyGw7AmxmuaZhWEU
-                5kEJADs=
-                '''),
-            tk.PhotoImage("img_closeactive", data='''
-                R0lGODlhCAAIAMIEAAAAAP/SAP/bNNnZ2cbGxsbGxsbGxsbGxiH5BAEKAAQALAAA
-                AAAIAAgAAAMVGDBEA0qNJyGw7AmxmuaZhWEU5kEJADs=
-                '''),
-            tk.PhotoImage("img_closepressed", data='''
-                R0lGODlhCAAIAMIEAAAAAOUqKv9mZtnZ2Ts7Ozs7Ozs7Ozs7OyH+EUNyZWF0ZWQg
-                d2l0aCBHSU1QACH5BAEKAAQALAAAAAAIAAgAAAMVGDBEA0qNJyGw7AmxmuaZhWEU
-                5kEJADs=
-            ''')
-        )
-
-        style.element_create("close", "image", "img_close",
-                            ("active", "pressed", "!disabled", "img_closepressed"),
-                            ("active", "!disabled", "img_closeactive"), border=8, sticky='')
-        style.layout("CustomNotebook", [("CustomNotebook.client", {"sticky": "nswe"})])
-        style.layout("CustomNotebook.Tab", [
-            ("CustomNotebook.tab", {
-                "sticky": "nswe",
-                "children": [
-                    ("CustomNotebook.padding", {
-                        "side": "top",
-                        "sticky": "nswe",
-                        "children": [
-                            ("CustomNotebook.focus", {
-                                "side": "top",
-                                "sticky": "nswe",
-                                "children": [
-                                    ("CustomNotebook.label", {"side": "left", "sticky": ''}),
-                                    ("CustomNotebook.close", {"side": "left", "sticky": ''}),
-                                ]
-                        })
-                    ]
-                })
-            ]
-        })
-    ])
-
 
 class MenuFuncs():
     """ Menu functions class"""
@@ -417,10 +330,105 @@ class MenuFuncs():
         tk.messagebox.showerror("Search", "Can't find the text:\n\"" + msg + "\"")
 
 
-class App():
-    """ App class"""
+class CustomNotebook(ttk.Notebook):
+    """A ttk Notebook with close buttons on each tab"""
 
-    def __init__(self) -> None:
+    __initialized = False
+
+    def __init__(self, *args, **kwargs):
+        if not self.__initialized:
+            self.__initialize_custom_style()
+            self.__inititialized = True
+
+        kwargs["style"] = "CustomNotebook"
+        ttk.Notebook.__init__(self, *args, **kwargs)
+
+        self._active = None
+
+        self.bind("<ButtonPress-1>", self.on_close_press, True)
+        self.bind("<ButtonRelease-1>", self.on_close_release)
+
+    def on_close_press(self, event):
+        """Called when the button is pressed over the close button"""
+
+        element = self.identify(event.x, event.y)
+
+        if "close" in element:
+            index = self.index("@%d,%d" % (event.x, event.y))
+            self.state(['pressed'])
+            self._active = index
+            return "break"
+
+    def on_close_release(self, event):
+        """Called when the button is released"""
+        if not self.instate(['pressed']):
+            return
+
+        element =  self.identify(event.x, event.y)
+        if "close" not in element:
+            # user moved the mouse off of the close button
+            return
+
+        index = self.index("@%d,%d" % (event.x, event.y))
+
+        if self._active == index:
+            self.forget(index)
+            self.event_generate("<<NotebookTabClosed>>")
+
+        self.state(["!pressed"])
+        self._active = None
+
+    def __initialize_custom_style(self):
+        style = ttk.Style()
+        self.images = (
+            tk.PhotoImage("img_close", data='''
+                R0lGODlhCAAIAMIBAAAAADs7O4+Pj9nZ2Ts7Ozs7Ozs7Ozs7OyH+EUNyZWF0ZWQg
+                d2l0aCBHSU1QACH5BAEKAAQALAAAAAAIAAgAAAMVGDBEA0qNJyGw7AmxmuaZhWEU
+                5kEJADs=
+                '''),
+            tk.PhotoImage("img_closeactive", data='''
+                R0lGODlhCAAIAMIEAAAAAP/SAP/bNNnZ2cbGxsbGxsbGxsbGxiH5BAEKAAQALAAA
+                AAAIAAgAAAMVGDBEA0qNJyGw7AmxmuaZhWEU5kEJADs=
+                '''),
+            tk.PhotoImage("img_closepressed", data='''
+                R0lGODlhCAAIAMIEAAAAAOUqKv9mZtnZ2Ts7Ozs7Ozs7Ozs7OyH+EUNyZWF0ZWQg
+                d2l0aCBHSU1QACH5BAEKAAQALAAAAAAIAAgAAAMVGDBEA0qNJyGw7AmxmuaZhWEU
+                5kEJADs=
+            ''')
+        )
+
+        style.element_create("close", "image", "img_close",
+                            ("active", "pressed", "!disabled", "img_closepressed"),
+                            ("active", "!disabled", "img_closeactive"), border=8, sticky='')
+        style.layout("CustomNotebook", [("CustomNotebook.client", {"sticky": "nswe"})])
+        style.layout("CustomNotebook.Tab", [
+            ("CustomNotebook.tab", {
+                "sticky": "nswe",
+                "children": [
+                    ("CustomNotebook.padding", {
+                        "side": "top",
+                        "sticky": "nswe",
+                        "children": [
+                            ("CustomNotebook.focus", {
+                                "side": "top",
+                                "sticky": "nswe",
+                                "children": [
+                                    ("CustomNotebook.label", {"side": "left", "sticky": ''}),
+                                    ("CustomNotebook.close", {"side": "left", "sticky": ''}),
+                                ]
+                        })
+                    ]
+                })
+            ]
+        })
+    ])
+
+
+class App(CustomNotebook):
+    """ AppNotebook class"""
+
+    def __init__(self, root) -> None:
+        self.root = root
         #self.abas = ttk.Notebook(self.root)
         self.abas = CustomNotebook(self.root)
         self.abas.place(relx=0, rely=0, relwidth=1, relheight=1)
@@ -437,7 +445,7 @@ class App():
         self.ws()
         #self.frames_ws()
         #self.widgets_frame()
-        self.Menus()
+        #self.Menus()
         # create Loop
         #root.mainloop()
 
@@ -471,6 +479,17 @@ class App():
 
         self.label1 = Label(self.frame_aba1, text="trtrta");
         self.label1.pack(side = "top")
+    
+    def change_state(self, *args):
+        #t_nos=str(my_tabs.index(my_tabs.select()))
+        idx = self.abas.index("current")
+        self.root.title(self.file_list[idx])
+    
+    def close_state(self, *args):
+        #t_nos=str(my_tabs.index(my_tabs.select()))
+        idx = self.abas.index("current")
+        del self.file_list[idx]
+        self.root.title(self.file_list[idx])
 
 
 ### Functions
@@ -512,10 +531,13 @@ def main():
     root.config(menu=menubar)
     root.option_add('*Dialog.msg.font', 'Helvica 11')
     menu = MenuFuncs(menubar, root, bfb)
+
+    notebook = App(root)
     
     #root.wm_iconname("mclist")
 
-    bfb.tree = setup_widgets(bfb.tree_columns)
+    #bfb.tree = setup_widgets(bfb.tree_columns)
+
     root.mainloop()
 
 if __name__ == "__main__":
